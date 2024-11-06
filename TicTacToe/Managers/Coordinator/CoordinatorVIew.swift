@@ -13,20 +13,22 @@ struct CoordinatorView: View {
     var body: some View {
         ZStack {
             switch coordinator.navigationState {
-            case .onboarding:
-                StartView(viewModel: StartViewModel(coordinator: coordinator))
+            case .launchScreen:
+                LaunchScreen(coordinator: coordinator)
+            case .mainScreen:
+                StartView(coordinator: coordinator)
             case .selectGame:
-                GameSelectView(viewModel: GameSelectViewModel(coordinator: coordinator))
+                GameSelectView(coordinator: coordinator)
             case .game:
-                GameView(viewModel: GameViewModel(coordinator: coordinator))
+                GameView(coordinator: coordinator)
             case .setting:
-                SettingGameView(viewModel: SettingsViewModel(coordinator: coordinator))
+                SettingGameView(coordinator: coordinator)
             case .rules:
-                RulesView(viewModel: RulesViewModel(coordinator: coordinator))
+                RulesView(coordinator: coordinator)
             case .result(let winner, let playedAgainstAI):
-                ResultView(viewModel: ResultViewModel(coordinator: coordinator, winner: winner, playedAgainstAI: playedAgainstAI))
+                ResultView(playedAgainstAI: playedAgainstAI, winner: winner, coordinator: coordinator)
             case .leaderboard:
-                LeaderboardView(viewModel: LeaderboardViewModel(coordinator: coordinator))
+                LeaderboardView(coordinator: coordinator)
             }
         }
         .transition(.opacity)

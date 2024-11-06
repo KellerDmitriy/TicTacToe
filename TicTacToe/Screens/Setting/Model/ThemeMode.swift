@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-enum Theme: String, CaseIterable {
-    case systemDefaut = "system"
+enum ThemeMode: String, CaseIterable {
+    case system = "system"
     case light = "light"
     case dark = "dark"
     
     var colorScheme: ColorScheme? {
         switch self {
-        case .systemDefaut:
+        case .system:
             return nil
         case .light:
             return .light

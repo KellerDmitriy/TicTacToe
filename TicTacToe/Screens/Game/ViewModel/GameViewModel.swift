@@ -114,6 +114,7 @@ final class GameViewModel: ObservableObject {
         musicManager.stopMusic()
         timerManager.stopTimer()
         playFinalMusic()
+        updateScore()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.navigateToResultScreen()
         }

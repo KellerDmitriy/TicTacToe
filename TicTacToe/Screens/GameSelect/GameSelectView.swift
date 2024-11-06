@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - GameSelectView
 struct GameSelectView: View {
     // MARK: - Properties
-    @ObservedObject var viewModel: GameSelectViewModel
+    @StateObject var viewModel: GameSelectViewModel
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     @State private var showCustomAlert = false
     
@@ -25,6 +25,10 @@ struct GameSelectView: View {
         static let paddingBottom: CGFloat = 20
     }
     
+    
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameSelectViewModel(coordinator: coordinator))
+    }
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -157,6 +161,6 @@ struct GameSelectView: View {
 
 // MARK: - Preview
 #Preview {
-    GameSelectView(viewModel: GameSelectViewModel(coordinator: Coordinator()))
+    GameSelectView(coordinator: Coordinator())
 }
 

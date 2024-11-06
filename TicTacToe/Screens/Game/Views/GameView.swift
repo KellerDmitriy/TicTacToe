@@ -9,8 +9,12 @@ import SwiftUI
 
 struct GameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-    @ObservedObject var viewModel: GameViewModel
+    @StateObject var viewModel: GameViewModel
 
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameViewModel(coordinator: coordinator))
+    }
+    
     var body: some View {
         ZStack {
             Color("basicBackground").ignoresSafeArea(.all)
@@ -45,7 +49,7 @@ struct GameView: View {
                     playerStyle: viewModel.currentPlayer.style,
                     action: viewModel.processPlayerMove(at:),
                     boardSize: viewModel.boardSize,
-                    winningPattern: viewModel.stateMachine.winningPattern
+                    winningPattern: viewModel.getWinningPattern()
                 )
                 .padding(.top, 20)
                 Spacer()
@@ -64,5 +68,5 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView(viewModel: GameViewModel(coordinator: Coordinator()))
+    GameView(coordinator: Coordinator())
 }

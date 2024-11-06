@@ -43,16 +43,27 @@ final class UserManager {
         let settings = storageManager.getSettings()
         player.symbol = settings.playerSymbol ?? .x
         player.style = settings.selectedStyle ?? .crossPinkCirclePurple
+        randomizeCurrentActivePlayer()
         return player
     }
     
     // Returns the opponent, updating the opponent's symbol and style based on the player
     func getOpponent() -> Player {
         let settings = storageManager.getSettings()
-        
         opponent.symbol = player.symbol == .x ? .o : .x
         opponent.style = settings.selectedStyle ?? .crossPinkCirclePurple
         return opponent
+    }
+    
+    func togglePlayerActive() {
+        player.isActive.toggle()
+        opponent.isActive = !player.isActive
+    }
+    
+    private func randomizeCurrentActivePlayer() {
+        let isPlayerActive = Bool.random()
+        player.isActive = isPlayerActive
+        opponent.isActive = !isPlayerActive
     }
     
     // Updates the player's score

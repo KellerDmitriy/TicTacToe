@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SettingGameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-
-    @ObservedObject var viewModel: SettingsViewModel
+    
+    @StateObject var viewModel: SettingsViewModel
     
     @State private var isLanguageState = false
     @State private var isMusicState = false
@@ -32,6 +32,9 @@ struct SettingGameView: View {
         static let titleFontSize: CGFloat = 20
     }
     
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: SettingsViewModel(coordinator: coordinator))
+    }
     var body: some View {
         ZStack {
             Color.basicBackground.ignoresSafeArea()
@@ -53,6 +56,7 @@ struct SettingGameView: View {
                 Spacer()
             }
         }
+        .preferredColorScheme(viewModel.userTheme.colorScheme)
     }
     
     private var toolBar: some View {
@@ -157,7 +161,7 @@ struct SettingGameView: View {
                                 action: {
                                     withAnimation {
                                         viewModel.selectedIndex = style
-                                        proxy.scrollTo(style, anchor: .center) // Прокрутка к выбранному стилю
+                                        proxy.scrollTo(style, anchor: .center)
                                     }
                                 }
                             )
@@ -170,16 +174,14 @@ struct SettingGameView: View {
                 .onAppear {
                     proxy.scrollTo(viewModel.selectedIndex, anchor: .center)
                 }
-                .onAppear {
-                    proxy.scrollTo(viewModel.selectedIndex, anchor: .center)
+
                 }
             }
         }
     }
-    
-}
+
 
 #Preview {
-    SettingGameView(viewModel: SettingsViewModel(coordinator: Coordinator()))
+    SettingGameView(coordinator: Coordinator())
 }
 

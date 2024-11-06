@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LeaderboardView: View {
-    @ObservedObject var viewModel: LeaderboardViewModel
+    @StateObject var viewModel: LeaderboardViewModel
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
 
     struct DrawingConstants {
@@ -19,7 +19,11 @@ struct LeaderboardView: View {
         static let gamesSectionBottomPadding: CGFloat = 10
         static let sectionSpacing: CGFloat = 20
     }
-
+    
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: LeaderboardViewModel(coordinator: coordinator))
+    }
+    
     var body: some View {
         ZStack {
             Color.basicBackground
@@ -88,5 +92,5 @@ struct LeaderboardView: View {
 }
 
 #Preview {
-    LeaderboardView(viewModel: LeaderboardViewModel(coordinator: Coordinator()))
+    LeaderboardView(coordinator: Coordinator())
 }

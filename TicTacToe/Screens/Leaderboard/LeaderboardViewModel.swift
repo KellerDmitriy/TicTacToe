@@ -40,7 +40,7 @@ final class LeaderboardViewModel: ObservableObject {
     
     //MARK: - NavigationState
     func dismissLeaderboard() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
 }
 

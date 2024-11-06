@@ -19,12 +19,12 @@ final class SettingsViewModel: ObservableObject {
     @Published var selectedBoardSize: BoardSize
     @Published var hasAppliedTheme: Bool = false
     @Published var isSelectedMusic: Bool
-    //UserTheme
-    @AppStorage("user_theme") var userTheme: Theme = .systemDefaut {
-        didSet {
-            applyTheme()
+ 
+    @AppStorage("themeMode") var userTheme: ThemeMode = .system {
+            willSet {
+                objectWillChange.send()
+            }
         }
-    }
     
     private let coordinator: Coordinator
     private let storageManager: StorageManager
@@ -51,30 +51,6 @@ final class SettingsViewModel: ObservableObject {
         self.selectedLevel = gameSettings.level
         self.selectedPlayerSymbol = gameSettings.playerSymbol ?? .x
         self.selectedBoardSize = gameSettings.boardSize
-        // Theme apply
-        applyTheme()
-    }
-    // Apply the selected theme to the app
-    
-    func applyTheme() {
-        if let window = UIApplication.shared.connectedScenes
-            .compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first {
-            switch userTheme {
-            case .light:
-                window.overrideUserInterfaceStyle = .light
-            case .dark:
-                window.overrideUserInterfaceStyle = .dark
-            default:
-                window.overrideUserInterfaceStyle = .unspecified
-            }
-            
-        }
-        
-        if !isFirstLoad {
-            hasAppliedTheme = true
-        } else {
-            isFirstLoad = false
-        }
     }
     
     func saveSettings() {

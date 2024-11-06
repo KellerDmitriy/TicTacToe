@@ -44,7 +44,7 @@ final class GameSelectViewModel: ObservableObject {
     }
     
     func showOnboarding() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
     
     // MARK: - Private Methods

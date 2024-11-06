@@ -9,8 +9,11 @@ import SwiftUI
 
 struct ResultView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-    @ObservedObject var viewModel: ResultViewModel
+    @StateObject var viewModel: ResultViewModel
     
+    init(playedAgainstAI: Bool, winner: Player?, coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: ResultViewModel(coordinator: coordinator, winner: winner, playedAgainstAI: playedAgainstAI))
+    }
     var body: some View {
         ZStack {
             Color.basicBackground.ignoresSafeArea(.all)
@@ -60,5 +63,9 @@ struct ResultView: View {
 }
 
 #Preview {
-    ResultView(viewModel: ResultViewModel(coordinator: Coordinator(), winner: Player(name: Resources.Text.ai, score: 0, symbol: .x, style: .burgerFries), playedAgainstAI: true))
+    ResultView(
+        playedAgainstAI: true ,
+        winner: Player(name: Resources.Text.ai, score: 0, symbol: .x, style: .burgerFries),
+        coordinator: Coordinator()
+    )
 }

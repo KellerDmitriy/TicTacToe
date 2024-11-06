@@ -53,15 +53,7 @@ final class StateMachine {
         self.gameManager = gameManager
         self.currentPlayer = player
     }
-    
-    // MARK: - Game Reset Methods
-    func resetGame() {
-        gameManager.resetGame()
 
-        gameResult = nil
-        winningPattern = nil
-        boardBlocked = false
-    }
     
     // MARK: - Reducer Logic
     func reduce(state: State, event: GameEvent) -> State {
@@ -70,7 +62,6 @@ final class StateMachine {
         switch event {
         case  .refresh:
             self.resetGame()
-            currentPlayer = randomizeCurrentActivePlayer()
             
         case .move(let position):
             guard !isGameOver else { return .gameOver }
@@ -88,7 +79,6 @@ final class StateMachine {
             
         case .toggleActivePlayer:
             player.isActive.toggle()
-            print("toggleActivePlayer")
             opponent.isActive = !player.isActive
             currentPlayer = player.isActive ? player : opponent
             return .play
@@ -104,15 +94,22 @@ final class StateMachine {
         return currentState
     }
     
+    // MARK: - Game Reset Methods
+    func resetGame() {
+        gameManager.resetGame()
+
+        gameResult = nil
+        winningPattern = nil
+        boardBlocked = false
+    }
+    
     // MARK: - Finish Game Logic
     private func finishGame(with result: GameResult) {
         gameResult = result
         boardBlocked = true
         winningPattern = gameManager.getWinningPattern()
+        print(winningPattern)
     }
     
-    private func randomizeCurrentActivePlayer() -> Player {
-        let isPlayerActive = Bool.random()
-        return isPlayerActive ? player : opponent
-    }
+    
 }

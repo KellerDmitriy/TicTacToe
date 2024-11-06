@@ -20,6 +20,6 @@ final class RulesViewModel: ObservableObject {
     
     //MARK: - NavigationState
     func dismissRules() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
 }

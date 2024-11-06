@@ -8,9 +8,12 @@ import SwiftUI
 
 struct StartView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
+    @StateObject var viewModel: StartViewModel
     @State private var isAnimating = false
-    @ObservedObject var viewModel: StartViewModel
-
+    
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: StartViewModel(coordinator: coordinator))
+    }
     var body: some View {
         ZStack {
             Color.basicBackground.ignoresSafeArea(.all)
