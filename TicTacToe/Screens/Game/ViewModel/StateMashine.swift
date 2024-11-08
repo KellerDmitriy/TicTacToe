@@ -38,9 +38,6 @@ final class StateMachine {
     var gameResult: GameResult?
     var boardBlocked = false
 
-    var isGameOver: Bool {
-        return gameManager.isGameOver || gameResult != nil || currentState == .gameOver
-    }
     
     // MARK: - Initializer
     init(_ player: Player,_ opponent: Player,_ gameMode: GameMode,_ gameManager: GameManager) {

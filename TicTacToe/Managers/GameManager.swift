@@ -58,10 +58,6 @@ final class GameManager {
         self.level = level
     }
     
-    func checkGameOver() -> Bool {
-        return isGameOver
-    }
-    
     // MARK: - Game Reset
     func resetGame() {
         let totalCells = boardSize.dimension * boardSize.dimension
