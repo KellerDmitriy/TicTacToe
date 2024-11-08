@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-    @StateObject var viewModel: GameViewModel
+    @StateObject private var viewModel: GameViewModel
 
     init(coordinator: Coordinator) {
         self._viewModel = StateObject(wrappedValue: GameViewModel(coordinator: coordinator))

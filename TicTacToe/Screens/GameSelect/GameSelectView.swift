@@ -25,10 +25,11 @@ struct GameSelectView: View {
         static let paddingBottom: CGFloat = 20
     }
     
-    
+    // MARK: - Init
     init(coordinator: Coordinator) {
         self._viewModel = StateObject(wrappedValue: GameSelectViewModel(coordinator: coordinator))
     }
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -101,7 +102,7 @@ struct GameSelectView: View {
                             placeHolder: Resources.Text.enterYourName.localized(language),
                             text: $viewModel.player
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                     }
                     
                     GameModeButton(
@@ -119,13 +120,13 @@ struct GameSelectView: View {
                             placeHolder: Resources.Text.enterYourName.localized(language),
                             text: $viewModel.player
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                         
                         CustomTextField(
                             placeHolder: Resources.Text.opponentName.localized(language),
                             text: $viewModel.opponent
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                     }
                     
                     nextButton

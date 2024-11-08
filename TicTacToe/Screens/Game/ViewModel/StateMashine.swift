@@ -48,7 +48,6 @@ final class StateMachine {
         self.currentPlayer = player
     }
 
-    
     // MARK: - Reducer Logic
     func reduce(state: State, event: GameEvent) -> State {
         currentState = state

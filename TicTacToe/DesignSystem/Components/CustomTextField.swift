@@ -5,7 +5,6 @@
 //  Created by Келлер Дмитрий on 09.10.2024.
 //
 
-
 import SwiftUI
 
 // MARK: - CustomTextField
@@ -21,7 +20,7 @@ struct CustomTextField: View {
         static let leadingPadding: CGFloat = 20
         static let verticalPadding: CGFloat = 16
         static let cornerRadius: CGFloat = 30
-        static let strokeWidth: CGFloat = 5.0
+        static let strokeWidth: CGFloat = 2.0
         static let strokeOpacity: CGFloat = 0.5
         static let borderColor = Color.secondaryPink
         static let textColor = Color.basicBlack
@@ -36,28 +35,27 @@ struct CustomTextField: View {
                 .foregroundColor(isActive || !text.isEmpty ? Drawing.filledBorderColor : .secondaryGray)
                 .padding(.horizontal, Drawing.leadingPadding)
                 .background(Color.clear)
-                .offset(x: 0, y: (isActive || !text.isEmpty) ? -25 : 0)
+                .offset(y: (isActive || !text.isEmpty) ? -20 : 0)
                 .scaleEffect(isActive || !text.isEmpty ? 0.8 : 1.0, anchor: .leading)
-                .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isActive || !text.isEmpty)
+                .animation(.easeInOut(duration: 0.2), value: isActive || !text.isEmpty)
             
-                TextField("", text: $text)
-                    .padding(.leading, Drawing.leadingPadding)
-                    .padding(.top, Drawing.verticalPadding)
-                    .focused($isActive)
-                    .frame(height: Drawing.height)
-                    .foregroundColor(Drawing.textColor)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    
+            TextField("", text: $text)
+                .padding(.leading, Drawing.leadingPadding)
+                .padding(.top, Drawing.verticalPadding)
+                .focused($isActive)
+                .frame(height: Drawing.height)
+                .foregroundColor(Drawing.textColor)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
         }
         .padding(.vertical, Drawing.verticalPadding / 2)
+        .background(Color.basicLightBlue)
+        .cornerRadius(Drawing.cornerRadius)
         .overlay(
             RoundedRectangle(cornerRadius: Drawing.cornerRadius)
                 .stroke(isActive || !text.isEmpty ? Drawing.filledBorderColor : Drawing.borderColor, lineWidth: Drawing.strokeWidth)
-                .opacity(Drawing.strokeOpacity)
+                .opacity(isActive ? 1 : Drawing.strokeOpacity)
         )
-        .background(Color.basicLightBlue)
-        .cornerRadius(30)
         .padding(.horizontal, 20)
         .onTapGesture {
             isActive = true
