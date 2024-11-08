@@ -198,8 +198,8 @@
 			isa = PBXGroup;
 			children = (
 				CB33F13F2CB19C590008A39F /* Info.plist */,
+				E1E0BDCF2CAA8DBE00DB8D34 /* Coordinator */,
 				CB6F3E542CA997AA005C2ED9 /* TicTacToeApp.swift */,
-				CB33F13D2CB19C400008A39F /* LaunchScreen */,
 				E1E0BDB52CA9EFCC00DB8D34 /* Models */,
 				CB6F3E6C2CA9AF33005C2ED9 /* Screens */,
 				CB6F3E652CA9A527005C2ED9 /* DesignSystem */,
@@ -241,6 +241,7 @@
 		CB6F3E6C2CA9AF33005C2ED9 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				CB33F13D2CB19C400008A39F /* LaunchScreen */,
 				E1E0BDDF2CAA9B1800DB8D34 /* Game */,
 				CB6F3E6D2CA9AF3F005C2ED9 /* Start */,
 				E1E0BDC12CAA865800DB8D34 /* Setting */,
@@ -388,7 +389,6 @@
 				E1392EEC2CAD2E6C00112013 /* UserManager.swift */,
 				E1E0BDB32CA9EC4900DB8D34 /* GameManager.swift */,
 				CB33F1362CB174070008A39F /* TimerManager.swift */,
-				E1E0BDCF2CAA8DBE00DB8D34 /* Coordinator */,
 				E1E0BDDC2CAA976500DB8D34 /* Localizations */,
 			);
 			path = Managers;

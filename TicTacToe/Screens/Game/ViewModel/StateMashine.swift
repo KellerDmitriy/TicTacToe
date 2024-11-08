@@ -20,7 +20,7 @@ final class StateMachine {
         case move(_ position: Int)
         case moveAI
         case toggleActivePlayer
-        case gameOver(_ result: GameResult)
+        case gameOver
         case outOfTime
     }
     
@@ -32,15 +32,12 @@ final class StateMachine {
     
     var player: Player
     var opponent: Player
-    
     var currentPlayer: Player
     
-    var gameResult: GameResult? = nil
     var winningPattern: [Int]? = nil
-
+    var gameResult: GameResult?
     var boardBlocked = false
 
-    // MARK: - Computed Properties
     var isGameOver: Bool {
         return gameManager.isGameOver || gameResult != nil || currentState == .gameOver
     }
@@ -64,13 +61,11 @@ final class StateMachine {
             self.resetGame()
             
         case .move(let position):
-            guard !isGameOver else { return .gameOver }
             if !currentPlayer.isAI {
                 gameManager.makeMove(at: position, for: currentPlayer)
             }
             
         case .moveAI:
-            guard !isGameOver else { return .gameOver }
             guard gameMode == .singlePlayer else { return .play }
             
             if currentPlayer.isAI {
@@ -84,11 +79,11 @@ final class StateMachine {
             return .play
             
         case .outOfTime:
-            finishGame(with: .draw)
+            finishGame()
             return .gameOver
             
-        case .gameOver(let result):
-            finishGame(with: result)
+        case .gameOver:
+            finishGame()
             return .gameOver
         }
         return currentState
@@ -96,20 +91,15 @@ final class StateMachine {
     
     // MARK: - Game Reset Methods
     func resetGame() {
-        gameManager.resetGame()
-
-        gameResult = nil
         winningPattern = nil
         boardBlocked = false
     }
     
     // MARK: - Finish Game Logic
-    private func finishGame(with result: GameResult) {
-        gameResult = result
+    private func finishGame() {
+        gameResult = gameManager.getGameResult(currentPlayer)
         boardBlocked = true
         winningPattern = gameManager.getWinningPattern()
-        print(winningPattern)
     }
-    
-    
+
 }

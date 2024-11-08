@@ -11,10 +11,13 @@ final class GameManager {
     
     private(set) var gameBoard: [PlayerSymbol?] = []
     private(set) var isGameOver: Bool = false
-    var winner: Player? = nil
-    var onBoardChange: (([PlayerSymbol?]) -> Void)?
+    
     var boardSize: BoardSize
     var level: DifficultyLevel
+    var winner: Player? = nil
+    var onBoardChange: (([PlayerSymbol?]) -> Void)?
+    var onGameOver: (() -> Void)?
+    
     
     // MARK: - Winning Patterns
     private var winningCombinations: [[Int]] {
@@ -53,6 +56,10 @@ final class GameManager {
     init(_ boardSize: BoardSize,_ level: DifficultyLevel ) {
         self.boardSize = boardSize
         self.level = level
+    }
+    
+    func checkGameOver() -> Bool {
+        return isGameOver
     }
     
     // MARK: - Game Reset
@@ -155,8 +162,10 @@ final class GameManager {
         if checkWin(for: player.symbol) {
             winner = player
             isGameOver = true
+            onGameOver?()
         } else if isBoardFull() {
             isGameOver = true
+            onGameOver?() 
         }
     }
     

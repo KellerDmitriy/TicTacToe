@@ -31,6 +31,7 @@ final class GameViewModel: ObservableObject {
     var gameMode: GameMode
     var level: DifficultyLevel
     
+    
     // MARK: - Computed Properties
     var currentPlayer: Player {
         stateMachine.currentPlayer
@@ -45,6 +46,7 @@ final class GameViewModel: ObservableObject {
     var currentScore: String {
         "\(player.score) : \(opponent.score)"
     }
+    
     
     // MARK: - Initialization
     init(coordinator: Coordinator,
@@ -79,10 +81,6 @@ final class GameViewModel: ObservableObject {
     }
     
     // MARK: - Game Logic
-    func processPlayerMove(at position: Int) {
-        dispatch(.move(position))
-    }
-    
     func getWinningPattern() -> [Int]? {
         stateMachine.winningPattern
     }
@@ -90,13 +88,12 @@ final class GameViewModel: ObservableObject {
     private func dispatch(_ event: StateMachine.GameEvent) {
         let newState = stateMachine.reduce(state: stateMachine.currentState, event: event)
         stateMachine.currentState = newState
-        
-        if stateMachine.isGameOver {
-            stateMachine.currentState = .gameOver
-            stopGame()
-        }
     }
     
+    func processPlayerMove(at position: Int) {
+        dispatch(.move(position))
+    }
+
     private func processAIMove() {
         dispatch(.moveAI)
     }
@@ -104,6 +101,7 @@ final class GameViewModel: ObservableObject {
     private func startGame() {
         musicManager.playMusic()
         timerManager.startTimer()
+        gameManager.resetGame()
         dispatch(.refresh)
     }
 
@@ -112,7 +110,8 @@ final class GameViewModel: ObservableObject {
         timerManager.stopTimer()
         playFinalMusic()
         updateScore()
-//        dispatch(.gameOver(GameResult))
+       
+        dispatch(.gameOver)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.navigateToResultScreen()
         }
@@ -127,10 +126,13 @@ final class GameViewModel: ObservableObject {
             self.dispatch(.toggleActivePlayer)
                 
             if self.currentPlayer.isAI {
-                print("binding AI move")
                     self.processAIMove()
                 }
             }
+        
+        gameManager.onGameOver = { [weak self] in
+                    self?.stopGame()
+                }
         
         timerManager.onTimeChange = { [weak self] newTime in
             DispatchQueue.main.async {
