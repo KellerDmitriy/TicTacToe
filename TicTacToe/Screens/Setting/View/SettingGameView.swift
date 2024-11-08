@@ -56,7 +56,7 @@ struct SettingGameView: View {
                 Spacer()
             }
         }
-        .preferredColorScheme(viewModel.userTheme.colorScheme)
+//        .preferredColorScheme(viewModel.themeMode.colorScheme)
     }
     
     private var toolBar: some View {
@@ -76,7 +76,7 @@ struct SettingGameView: View {
             VStack(spacing: Drawing.spacingBetweenElements) {
                 
                 SettingPickerView(
-                    selectedValue: $viewModel.userTheme,
+                    selectedValue: $viewModel.themeMode,
                     isExpanded: $isThemeState,
                     title: Resources.Text.selectTheme.localized(language)
                 )

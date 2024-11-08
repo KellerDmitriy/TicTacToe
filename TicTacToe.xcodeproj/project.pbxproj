@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		ADA899CA2CADAF8300363BDB /* GameSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA899C92CADAF7900363BDB /* GameSelectView.swift */; };
-		CB0B050E2CBAE06F001166B9 /* ThemeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0B050D2CBAE06F001166B9 /* ThemeMode.swift */; };
 		CB33F1372CB174070008A39F /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB33F1362CB174070008A39F /* TimerManager.swift */; };
 		CB33F13E2CB19C400008A39F /* LaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB33F13C2CB19C400008A39F /* LaunchScreen.swift */; };
 		CB511C4B2CAFD1E5001454B5 /* classic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CB511C442CAFD1E5001454B5 /* classic.mp3 */; };
@@ -77,7 +76,6 @@
 
 /* Begin PBXFileReference section */
 		ADA899C92CADAF7900363BDB /* GameSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSelectView.swift; sourceTree = "<group>"; };
-		CB0B050D2CBAE06F001166B9 /* ThemeMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeMode.swift; sourceTree = "<group>"; };
 		CB33F1362CB174070008A39F /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
 		CB33F13C2CB19C400008A39F /* LaunchScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
 		CB33F13F2CB19C590008A39F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -286,7 +284,6 @@
 			isa = PBXGroup;
 			children = (
 				E1392EF92CAD367F00112013 /* SettingModel.swift */,
-				CB0B050D2CBAE06F001166B9 /* ThemeMode.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -617,7 +614,6 @@
 				E1392F0E2CADD9E700112013 /* GameResult.swift in Sources */,
 				E148E8782CB282D300018E70 /* CustomAlertView.swift in Sources */,
 				E1392F1C2CADEAD200112013 /* MusicStorage.swift in Sources */,
-				CB0B050E2CBAE06F001166B9 /* ThemeMode.swift in Sources */,
 				E1392F072CADA88500112013 /* GameView.swift in Sources */,
 				CB6F3E672CA9A539005C2ED9 /* BasicButton.swift in Sources */,
 				E1E0BDC52CAA86C200DB8D34 /* RulesView.swift in Sources */,

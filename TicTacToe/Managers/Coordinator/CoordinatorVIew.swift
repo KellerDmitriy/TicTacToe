@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CoordinatorView: View {
     @ObservedObject var coordinator = Coordinator()
+    let storageManager = StorageManager.shared
     
     var body: some View {
         ZStack {
@@ -31,6 +32,8 @@ struct CoordinatorView: View {
                 LeaderboardView(coordinator: coordinator)
             }
         }
+        .preferredColorScheme(storageManager.getSettings().themeMode.colorScheme)
+ 
         .transition(.opacity)
         .animation(.easeInOut(duration: 0.3), value: coordinator.navigationState)
     }

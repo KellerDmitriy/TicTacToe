@@ -5,9 +5,10 @@
 //  Created by Келлер Дмитрий on 02.10.2024.
 //
 
-import Foundation
+import SwiftUI
 
 struct GameSettings: Codable {
+    var themeMode: ThemeMode
     let level: DifficultyLevel
     let duration: Duration
     let selectedStyle: PlayerStyle?
@@ -15,6 +16,23 @@ struct GameSettings: Codable {
     let musicStyle: MusicStyle
     let playerSymbol: PlayerSymbol?
     var boardSize: BoardSize
+}
+
+enum ThemeMode: String, CaseIterable, Codable {
+    case system = "system"
+    case light = "light"
+    case dark = "dark"
+    
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
 }
 
 enum BoardSize: String, Codable, CaseIterable {
@@ -89,6 +107,7 @@ enum PlayerStyle: Codable, CaseIterable {
 extension GameSettings {
     static func defaultGameSettings() -> GameSettings {
         return GameSettings(
+            themeMode: .system,
             level: .normal,
             duration: defaultRaundDuration(),
             selectedStyle: .crossPinkCirclePurple,

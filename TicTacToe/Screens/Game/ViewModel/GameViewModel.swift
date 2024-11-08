@@ -92,6 +92,7 @@ final class GameViewModel: ObservableObject {
         stateMachine.currentState = newState
         
         if stateMachine.isGameOver {
+            stateMachine.currentState = .gameOver
             stopGame()
         }
     }
@@ -104,10 +105,6 @@ final class GameViewModel: ObservableObject {
         musicManager.playMusic()
         timerManager.startTimer()
         dispatch(.refresh)
-        
-        if currentPlayer.isAI {
-            dispatch(.moveAI)
-        }
     }
 
     private func stopGame() {
@@ -115,6 +112,7 @@ final class GameViewModel: ObservableObject {
         timerManager.stopTimer()
         playFinalMusic()
         updateScore()
+//        dispatch(.gameOver(GameResult))
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.navigateToResultScreen()
         }

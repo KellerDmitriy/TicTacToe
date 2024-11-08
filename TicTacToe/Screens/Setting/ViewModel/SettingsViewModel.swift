@@ -8,9 +8,9 @@
 import Foundation
 import SwiftUI
 
-
 final class SettingsViewModel: ObservableObject {
     // MARK: Properties
+    @Published var themeMode: ThemeMode
     @Published var selectedIndex: PlayerStyle
     @Published var selectedDuration: Duration
     @Published var selectedMusic: MusicStyle
@@ -19,12 +19,6 @@ final class SettingsViewModel: ObservableObject {
     @Published var selectedBoardSize: BoardSize
     @Published var hasAppliedTheme: Bool = false
     @Published var isSelectedMusic: Bool
- 
-    @AppStorage("themeMode") var userTheme: ThemeMode = .system {
-            willSet {
-                objectWillChange.send()
-            }
-        }
     
     private let coordinator: Coordinator
     private let storageManager: StorageManager
@@ -44,6 +38,7 @@ final class SettingsViewModel: ObservableObject {
         self.coordinator = coordinator
         self.gameSettings = storageManager.getSettings()
         
+        self.themeMode = gameSettings.themeMode
         self.selectedIndex = gameSettings.selectedStyle ?? .crossFilledPurpleCircleFilledPurple
         self.selectedDuration = gameSettings.duration
         self.isSelectedMusic = gameSettings.isSelecttedMusic
@@ -59,6 +54,7 @@ final class SettingsViewModel: ObservableObject {
         : Duration(isSelectedDuration: false, valueDuration: nil)
         
         gameSettings = GameSettings(
+            themeMode: themeMode,
             level: selectedLevel,
             duration: duration,
             selectedStyle: selectedIndex,
@@ -68,6 +64,10 @@ final class SettingsViewModel: ObservableObject {
             boardSize: selectedBoardSize
         )
         storageManager.saveSettings(gameSettings)
+    }
+    
+    func getSettings() {
+        storageManager.getSettings()
     }
     
     func resetToDefault() {
