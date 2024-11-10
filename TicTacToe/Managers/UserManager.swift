@@ -7,7 +7,6 @@
 import Foundation
 
 final class UserManager {
-    public static let shared = UserManager()
     private let storageManager: StorageManager
     
     private var player: Player
@@ -16,7 +15,7 @@ final class UserManager {
     private(set) var gameMode: GameMode = .singlePlayer
     
     // Initializes the UserManager with a shared StorageManager
-    private init(storageManager: StorageManager = .shared) {
+    init(storageManager: StorageManager = .shared) {
         self.storageManager = storageManager
         
         // Initialize players with their default settings and scores

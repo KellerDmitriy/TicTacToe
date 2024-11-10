@@ -5,13 +5,16 @@
 //  Created by Келлер Дмитрий on 30.09.2024.
 //
 import Foundation
+import Combine
 
+@MainActor
 final class GameViewModel: ObservableObject {
     
     // MARK: - Published Properties
-    @Published private(set) var stateMachine: StateMachine
-    @Published var gameBoard: [PlayerSymbol?] = []
+    @Published private(set) var gameBoard: [PlayerSymbol?] = []
     @Published var secondsCount = 0
+    @Published var timerDisplay = "00:00"
+    @Published private(set) var stateMachineState: StateMachine.State
     
     // MARK: - Private Properties
     private let coordinator: Coordinator
@@ -19,130 +22,109 @@ final class GameViewModel: ObservableObject {
     private let userManager: UserManager
     private let timerManager: TimerManager
     private let musicManager: MusicManager
-    private let storageManager: StorageManager
+    private let stateMachine: StateMachine
     
-    private var roundResults: [String] = []
-    private var totalGameDuration = 0
+    private let storageManager = StorageManager.shared
+    private var cancellables = Set<AnyCancellable>()
     
-    // MARK: - Game Settings
-    var player: Player
-    var opponent: Player
     var boardSize: BoardSize
     var gameMode: GameMode
     var level: DifficultyLevel
     
-    
     // MARK: - Computed Properties
-    var currentPlayer: Player {
-        stateMachine.currentPlayer
-    }
-    
-    var timerDisplay: String {
-        let minutes = secondsCount / 60
-        let seconds = secondsCount % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
-    var currentScore: String {
-        "\(player.score) : \(opponent.score)"
-    }
-    
+    var activePlayer: Player { gameManager.activePlayer }
+    var player: Player { gameManager.player }
+    var opponent: Player { gameManager.opponent }
+    var currentScore: String { "\(player.score) : \(opponent.score)" }
+    var winningPattern: [Int]? = nil
     
     // MARK: - Initialization
-    init(coordinator: Coordinator,
-         userManager: UserManager = .shared,
-         storageManager: StorageManager = .shared
-    ) {
+    init(coordinator: Coordinator) {
         self.coordinator = coordinator
-        self.userManager = userManager
-        self.storageManager = storageManager
-        
+        self.userManager = UserManager()
         self.timerManager = TimerManager()
         self.musicManager = MusicManager()
         
-        player = userManager.getPlayer()
-        opponent = userManager.getOpponent()
+        // Load game settings
         
         self.boardSize = storageManager.getSettings().boardSize
         self.gameMode = userManager.gameMode
         self.level = storageManager.getSettings().level
         
-        self.gameManager = GameManager(boardSize, level)
+        // Initialize game manager and state machine
+        self.gameManager = GameManager(boardSize, level, userManager)
+        self.stateMachine = StateMachine(gameManager: gameManager)
+        self.stateMachineState = .startGame
         
-        self.stateMachine = StateMachine(
-            player,
-            opponent,
-            gameMode,
-            gameManager
-        )
-        
-        setupGameBindings()
+        setupBindings()
         startGame()
     }
     
-    // MARK: - Game Logic
-    func getWinningPattern() -> [Int]? {
-        stateMachine.winningPattern
-    }
-    
-    private func dispatch(_ event: StateMachine.GameEvent) {
-        let newState = stateMachine.reduce(state: stateMachine.currentState, event: event)
-        stateMachine.currentState = newState
-    }
-    
-    func processPlayerMove(at position: Int) {
-        dispatch(.move(position))
-    }
-
-    private func processAIMove() {
-        dispatch(.moveAI)
-    }
-    
-    private func startGame() {
-        musicManager.playMusic()
-        timerManager.startTimer()
-        gameManager.resetGame()
-        dispatch(.refresh)
-    }
-
-    private func stopGame() {
-        musicManager.stopMusic()
-        timerManager.stopTimer()
-        playFinalMusic()
-        updateScore()
-       
-        dispatch(.gameOver)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.navigateToResultScreen()
-        }
-    }
-    
-    // MARK: - Helpers
-    private func setupGameBindings() {
+    // MARK: - Setup Bindings
+    private func setupBindings() {
         gameManager.onBoardChange = { [weak self] updatedBoard in
-            guard let self else { return }
-            self.gameBoard = updatedBoard
-        
-            self.dispatch(.toggleActivePlayer)
-                
-            if self.currentPlayer.isAI {
-                    self.processAIMove()
-                }
+            DispatchQueue.main.async {
+                self?.gameBoard = updatedBoard
             }
-        
-        gameManager.onGameOver = { [weak self] in
-                    self?.stopGame()
-                }
+        }
         
         timerManager.onTimeChange = { [weak self] newTime in
             DispatchQueue.main.async {
-                self?.secondsCount = newTime
+                self?.updateTimer(newTime)
             }
         }
         
         timerManager.outOfTime = { [weak self] in
-            self?.dispatch(.outOfTime)
+            self?.stateMachine.handle(event: .outOfTime)
         }
+        
+        // Observe state changes in the state machine
+        stateMachine.$currentState
+            .sink { [weak self] newState in
+                self?.stateMachineState = newState
+                self?.handleStateChange()
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - Handle State Changes
+    private func handleStateChange() {
+        switch stateMachineState {
+        case .startGame:
+            musicManager.playMusic()
+            timerManager.startTimer()
+            stateMachine.handle(event: .refresh)
+            
+        case .play:
+            if activePlayer.isAI {
+                stateMachine.handle(event: .moveAI)
+            }
+            
+        case .gameOver:
+            musicManager.stopMusic()
+            timerManager.stopTimer()
+            winningPattern = gameManager.getWinningPattern()
+            updateScore()
+            playFinalMusic()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.navigateToResultScreen()
+            }
+        }
+    }
+    
+    // MARK: - Game Actions
+    func playerMove(at position: Int) {
+        guard !activePlayer.isAI else { return }
+        stateMachine.handle(event: .move(position))
+    }
+    
+    private func startGame() {
+        stateMachine.handle(event: .refresh)
+    }
+    
+    private func updateTimer(_ seconds: Int) {
+        self.secondsCount = seconds
+        timerDisplay = formatTime(seconds)
     }
     
     private func playFinalMusic() {
@@ -150,7 +132,12 @@ final class GameViewModel: ObservableObject {
         musicManager.stopMusic()
     }
     
-    // MARK: - Navigation
+    private func updateScore() {
+        if let winner = gameManager.winner {
+            winner == player ? userManager.updatePlayerScore() : userManager.updateOpponentScore()
+        }
+    }
+    
     private func navigateToResultScreen() {
         coordinator.updateNavigationState(action: .showResult(
             winner: gameManager.winner,
@@ -158,18 +145,9 @@ final class GameViewModel: ObservableObject {
         ))
     }
     
-    // MARK: - Score Management
-    private func updateScore() {
-        if let winner = gameManager.winner {
-            winner == player
-            ? userManager.updatePlayerScore()
-            : userManager.updateOpponentScore()
-        }
-    }
-    
-    // MARK: - Result Recording
-    private func recordRoundResult() {
-        let resultString = "\(player.name) : \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
-        roundResults.append(resultString)
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let seconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

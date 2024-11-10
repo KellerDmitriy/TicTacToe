@@ -18,8 +18,8 @@ final class GameSelectViewModel: ObservableObject {
     private let coordinator: Coordinator
     
     // MARK: Initialization
-    init(userManager: UserManager = .shared, coordinator: Coordinator) {
-        self.userManager = userManager
+    init(coordinator: Coordinator) {
+        self.userManager = UserManager()
         self.coordinator = coordinator
     }
     
