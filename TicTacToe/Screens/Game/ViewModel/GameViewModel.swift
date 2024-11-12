@@ -46,7 +46,6 @@ final class GameViewModel: ObservableObject {
         self.musicManager = MusicManager()
         
         // Load game settings
-        
         self.boardSize = storageManager.getSettings().boardSize
         self.gameMode = userManager.gameMode
         self.level = storageManager.getSettings().level
@@ -78,13 +77,11 @@ final class GameViewModel: ObservableObject {
             self?.stateMachine.handle(event: .outOfTime)
         }
         
-        // Observe state changes in the state machine
-        stateMachine.$currentState
-            .sink { [weak self] newState in
-                self?.stateMachineState = newState
-                self?.handleStateChange()
-            }
-            .store(in: &cancellables)
+        stateMachine.onStateChange = { [weak self] newState in
+            guard let self = self else { return }
+            self.stateMachineState = newState
+            self.handleStateChange()
+        }
     }
     
     // MARK: - Handle State Changes
@@ -93,7 +90,7 @@ final class GameViewModel: ObservableObject {
         case .startGame:
             musicManager.playMusic()
             timerManager.startTimer()
-            stateMachine.handle(event: .refresh)
+//            stateMachine.handle(event: .refresh)
             
         case .play:
             if activePlayer.isAI {

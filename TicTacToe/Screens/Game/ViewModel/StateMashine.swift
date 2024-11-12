@@ -6,7 +6,7 @@
 //
 import Foundation
 
-final class StateMachine: ObservableObject {
+final class StateMachine {
     enum State {
         case startGame
         case play
@@ -25,7 +25,12 @@ final class StateMachine: ObservableObject {
     // MARK: - Properties
     private let gameManager: GameManager
     
-    @Published var currentState: State = .startGame
+    var onStateChange: ((State) -> Void)?
+    private(set) var currentState: State = .startGame {
+        didSet {
+            onStateChange?(currentState)
+        }
+    }
     
     private var gameMode: GameMode { gameManager.gameMode }
     
