@@ -5,7 +5,6 @@
 //  Created by Келлер Дмитрий on 30.09.2024.
 //
 import Foundation
-import Combine
 
 @MainActor
 final class GameViewModel: ObservableObject {
@@ -14,18 +13,17 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var gameBoard: [PlayerSymbol?] = []
     @Published var secondsCount = 0
     @Published var timerDisplay = "00:00"
-    @Published private(set) var stateMachineState: StateMachine.State
+    @Published private(set) var currentState: StateMachine.GameState = .startGame
     
     // MARK: - Private Properties
+    private let stateMachine: StateMachine
     private let coordinator: Coordinator
     private var gameManager: GameManager
     private let userManager: UserManager
     private let timerManager: TimerManager
     private let musicManager: MusicManager
-    private let stateMachine: StateMachine
     
     private let storageManager = StorageManager.shared
-    private var cancellables = Set<AnyCancellable>()
     
     var boardSize: BoardSize
     var gameMode: GameMode
@@ -52,49 +50,52 @@ final class GameViewModel: ObservableObject {
         
         // Initialize game manager and state machine
         self.gameManager = GameManager(boardSize, level, userManager)
-        self.stateMachine = StateMachine(gameManager: gameManager)
-        self.stateMachineState = .startGame
+        self.stateMachine = StateMachine(initialState: .startGame)
         
-        setupBindings()
-        startGame()
+        setupGameBindings()
+        triggerEvent(.refresh)
     }
     
-    // MARK: - Setup Bindings
-    private func setupBindings() {
+    private func setupGameBindings() {
+        stateMachine.onStateChange = { [weak self] newState in
+            self?.handleStateChange(newState)
+        }
+        
         gameManager.onBoardChange = { [weak self] updatedBoard in
-            DispatchQueue.main.async {
-                self?.gameBoard = updatedBoard
-            }
+            guard let self else { return }
+            self.gameBoard = updatedBoard
+        }
+        
+        gameManager.onGameOver = { [weak self] in
+            self?.triggerEvent(.gameOver)
         }
         
         timerManager.onTimeChange = { [weak self] newTime in
             DispatchQueue.main.async {
-                self?.updateTimer(newTime)
+                self?.secondsCount = newTime
             }
         }
         
         timerManager.outOfTime = { [weak self] in
-            self?.stateMachine.handle(event: .outOfTime)
-        }
-        
-        stateMachine.onStateChange = { [weak self] newState in
-            guard let self = self else { return }
-            self.stateMachineState = newState
-            self.handleStateChange()
+            self?.triggerEvent(.outOfTime)
         }
     }
     
-    // MARK: - Handle State Changes
-    private func handleStateChange() {
-        switch stateMachineState {
+    // Метод для обработки изменений состояния
+    private func handleStateChange(_ state: StateMachine.GameState) {
+        print("Текущее состояние: \(state)")
+        currentState = state
+        
+        switch state {
         case .startGame:
+            stateMachine.handle(event: .refresh)
+            gameManager.resetGame()
             musicManager.playMusic()
             timerManager.startTimer()
-//            stateMachine.handle(event: .refresh)
             
         case .play:
-            if activePlayer.isAI {
-                stateMachine.handle(event: .moveAI)
+            if gameManager.activePlayer.isAI {
+                gameManager.aiMove()
             }
             
         case .gameOver:
@@ -109,19 +110,28 @@ final class GameViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Game Actions
-    func playerMove(at position: Int) {
-        guard !activePlayer.isAI else { return }
-        stateMachine.handle(event: .move(position))
+    // Функция для записи событий и изменения состояния
+    func triggerEvent(_ event: StateMachine.GameEvent) {
+        stateMachine.handle(event: event)
     }
     
-    private func startGame() {
-        stateMachine.handle(event: .refresh)
+    // Пример использования
+    func processPlayerMove(at position: Int) {
+        if stateMachine.currentState == .play {
+            gameManager.makeMove(at: position)
+            if gameManager.isGameOver {
+                triggerEvent(.gameOver)
+            } else {
+                triggerEvent(.toggleActivePlayer)
+            }
+        }
     }
     
-    private func updateTimer(_ seconds: Int) {
-        self.secondsCount = seconds
-        timerDisplay = formatTime(seconds)
+    // Пример обработки события по истечении времени
+    private func handleOutOfTime() {
+        if stateMachine.currentState == .play {
+            triggerEvent(.outOfTime)
+        }
     }
     
     private func playFinalMusic() {
@@ -129,12 +139,7 @@ final class GameViewModel: ObservableObject {
         musicManager.stopMusic()
     }
     
-    private func updateScore() {
-        if let winner = gameManager.winner {
-            winner == player ? userManager.updatePlayerScore() : userManager.updateOpponentScore()
-        }
-    }
-    
+    // MARK: - Navigation
     private func navigateToResultScreen() {
         coordinator.updateNavigationState(action: .showResult(
             winner: gameManager.winner,
@@ -142,9 +147,19 @@ final class GameViewModel: ObservableObject {
         ))
     }
     
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let seconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+    // MARK: - Score Management
+    private func updateScore() {
+        if let winner = gameManager.winner {
+            winner == player
+            ? userManager.updatePlayerScore()
+            : userManager.updateOpponentScore()
+        }
     }
+    
+    // MARK: - Result Recording
+    //       private func recordRoundResult() {
+    //           let resultString = "\(player.name) : \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
+    //           roundResults.append(resultString)
+    //       }
+    
 }

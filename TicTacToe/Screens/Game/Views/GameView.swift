@@ -47,7 +47,7 @@ struct GameView: View {
                 GameFieldView(
                     gameBoard: viewModel.gameBoard,
                     playerStyle: viewModel.activePlayer.style,
-                    action: viewModel.playerMove(at:),
+                    action: viewModel.processPlayerMove(at:),
                     boardSize: viewModel.boardSize,
                     winningPattern: viewModel.winningPattern
                 )

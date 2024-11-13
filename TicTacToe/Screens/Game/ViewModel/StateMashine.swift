@@ -7,12 +7,18 @@
 import Foundation
 
 final class StateMachine {
-    enum State {
+    typealias StateChangeHandler = (GameState) -> Void
+  
+    private(set) var currentState: GameState
+    
+    var onStateChange: StateChangeHandler?
+    
+    enum GameState {
         case startGame
         case play
         case gameOver
     }
-    
+
     enum GameEvent {
         case refresh
         case move(_ position: Int)
@@ -21,67 +27,38 @@ final class StateMachine {
         case gameOver
         case outOfTime
     }
-
-    // MARK: - Properties
-    private let gameManager: GameManager
     
-    var onStateChange: ((State) -> Void)?
-    private(set) var currentState: State = .startGame {
-        didSet {
-            onStateChange?(currentState)
-        }
+    // Инициализация с начальным состоянием
+    init(initialState: GameState) {
+        self.currentState = initialState
     }
     
-    private var gameMode: GameMode { gameManager.gameMode }
-    
-    // MARK: - Initialization
-    init(gameManager: GameManager) {
-        self.gameManager = gameManager
-    }
-    
-    // MARK: - State Transition
+    // Метод для обработки события и перехода в новое состояние
     func handle(event: GameEvent) {
-        switch (currentState, event) {
-        case (.startGame, .refresh):
-            resetGame()
-            currentState = .startGame
-
-        case (.play, .move(let position)):
-            if !gameManager.player.isAI {
-                gameManager.makeMove(at: position)
-                currentState = gameManager.isGameOver ? .gameOver : .play
-            }
-
-        case (.play, .moveAI):
-            guard gameMode == .singlePlayer else { return }
-            if gameManager.player.isAI {
-                gameManager.aiMove()
-                currentState = gameManager.isGameOver ? .gameOver : .play
-            }
-
-        case (.play, .toggleActivePlayer):
-            gameManager.toggleActivePlayer()
-            currentState = .play
-
-        case (.gameOver, .outOfTime):
-            currentState = .gameOver
-            finishGame()
-            
-        case (.gameOver, .gameOver):
-            currentState = .gameOver
-            finishGame()
-            
-        default:
-            break
-        }
-    }
-
-    // MARK: - Private Methods
-    private func resetGame() {
-        gameManager.resetGame()
-    }
+        guard let newState = nextState(from: currentState, event: event) else { return }
+           
+           // Обновляем текущее состояние
+           if newState != currentState {
+               currentState = newState
+               
+               // Вызываем колбэк, если он установлен
+               onStateChange?(newState)
+           }
+       }
     
-    private func finishGame() {
-        gameManager.finalizeGameResult()
+    // Метод, который определяет переход между состояниями. Его нужно переопределить в подклассах.
+    func nextState(from state: GameState, event: GameEvent) -> GameState? {
+        switch (state, event) {
+        case (.startGame, .refresh):
+            return .play
+        case (.play, .move), (.play, .moveAI), (.play, .toggleActivePlayer):
+            return .play
+        case (.play, .gameOver), (.play, .outOfTime):
+            return .gameOver
+        case (.gameOver, .refresh):
+            return .startGame
+        default:
+            return nil
+        }
     }
 }

@@ -34,7 +34,6 @@ final class GameManager {
         self.boardSize = boardSize
         self.level = level
         
-     
         self.player = userManager.getPlayer()
         self.opponent = userManager.getOpponent()
         
@@ -63,17 +62,16 @@ final class GameManager {
             gameBoard[position] = activePlayer.symbol
             evaluateGameState()
             onBoardChange?(self.gameBoard)
+            toggleActivePlayer()
         }
         
         // MARK: - AI Move
-        func aiMove() {
+    func aiMove() {
             guard !isGameOver else { return }
             if activePlayer.isAI {
                 aiDecision(for: activePlayer) { [weak self] move in
                     guard let self = self, let move = move else { return }
-                    self.performAIMove(at: move)
-                    evaluateGameState()
-                    self.onBoardChange?(self.gameBoard)
+                    self.makeMove(at: move)
                 }
             }
         }
