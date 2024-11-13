@@ -42,7 +42,6 @@ final class UserManager {
         let settings = storageManager.getSettings()
         player.symbol = settings.playerSymbol ?? .x
         player.style = settings.selectedStyle ?? .crossPinkCirclePurple
-        randomizeCurrentActivePlayer()
         return player
     }
     
@@ -53,18 +52,7 @@ final class UserManager {
         opponent.style = settings.selectedStyle ?? .crossPinkCirclePurple
         return opponent
     }
-    
-    func togglePlayerActive() {
-        player.isActive.toggle()
-        opponent.isActive = !player.isActive
-    }
-    
-    private func randomizeCurrentActivePlayer() {
-        let isPlayerActive = Bool.random()
-        player.isActive = isPlayerActive
-        opponent.isActive = !isPlayerActive
-    }
-    
+
     // Updates the player's score
     func updatePlayerScore() {
         player.score += 1

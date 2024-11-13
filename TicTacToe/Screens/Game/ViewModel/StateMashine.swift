@@ -12,6 +12,7 @@ final class StateMachine {
     private(set) var currentState: GameState
     
     var onStateChange: StateChangeHandler?
+    var onToggleActivePlayer: (() -> Void)?
     
     enum GameState {
         case startGame
@@ -28,25 +29,24 @@ final class StateMachine {
         case outOfTime
     }
     
-    // Инициализация с начальным состоянием
     init(initialState: GameState) {
         self.currentState = initialState
     }
     
-    // Метод для обработки события и перехода в новое состояние
+
     func handle(event: GameEvent) {
-        guard let newState = nextState(from: currentState, event: event) else { return }
-           
-           // Обновляем текущее состояние
-           if newState != currentState {
-               currentState = newState
-               
-               // Вызываем колбэк, если он установлен
-               onStateChange?(newState)
-           }
-       }
-    
-    // Метод, который определяет переход между состояниями. Его нужно переопределить в подклассах.
+        switch event {
+        case .toggleActivePlayer:
+            onToggleActivePlayer?()
+            
+        default:
+            if let newState = nextState(from: currentState, event: event) {
+                currentState = newState
+                onStateChange?(newState)
+            }
+        }
+    }
+
     func nextState(from state: GameState, event: GameEvent) -> GameState? {
         switch (state, event) {
         case (.startGame, .refresh):

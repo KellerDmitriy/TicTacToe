@@ -37,9 +37,9 @@ final class GameViewModel: ObservableObject {
     var winningPattern: [Int]? = nil
     
     // MARK: - Initialization
-    init(coordinator: Coordinator) {
+    init(userManager: UserManager, coordinator: Coordinator) {
         self.coordinator = coordinator
-        self.userManager = UserManager()
+        self.userManager = userManager
         self.timerManager = TimerManager()
         self.musicManager = MusicManager()
         
@@ -53,7 +53,8 @@ final class GameViewModel: ObservableObject {
         self.stateMachine = StateMachine(initialState: .startGame)
         
         setupGameBindings()
-        triggerEvent(.refresh)
+//        triggerEvent(.refresh)
+        handleStateChange(.startGame)
     }
     
     private func setupGameBindings() {
@@ -61,9 +62,16 @@ final class GameViewModel: ObservableObject {
             self?.handleStateChange(newState)
         }
         
+        stateMachine.onToggleActivePlayer = { [weak self] in
+            self?.gameManager.togglePlayerActive()
+        }
+        
         gameManager.onBoardChange = { [weak self] updatedBoard in
             guard let self else { return }
             self.gameBoard = updatedBoard
+            self.triggerEvent(.toggleActivePlayer)
+            print("onBoardChange")
+            self.triggerEvent(.moveAI)
         }
         
         gameManager.onGameOver = { [weak self] in
@@ -73,6 +81,7 @@ final class GameViewModel: ObservableObject {
         timerManager.onTimeChange = { [weak self] newTime in
             DispatchQueue.main.async {
                 self?.secondsCount = newTime
+                self?.timerDisplay = self?.formattedTime(newTime) ?? "00:00"
             }
         }
         
@@ -88,13 +97,14 @@ final class GameViewModel: ObservableObject {
         
         switch state {
         case .startGame:
-            stateMachine.handle(event: .refresh)
             gameManager.resetGame()
             musicManager.playMusic()
             timerManager.startTimer()
+            stateMachine.handle(event: .refresh)
             
         case .play:
             if gameManager.activePlayer.isAI {
+                print("handleStateChange")
                 gameManager.aiMove()
             }
             
@@ -110,27 +120,15 @@ final class GameViewModel: ObservableObject {
         }
     }
     
-    // Функция для записи событий и изменения состояния
     func triggerEvent(_ event: StateMachine.GameEvent) {
         stateMachine.handle(event: event)
     }
     
-    // Пример использования
     func processPlayerMove(at position: Int) {
         if stateMachine.currentState == .play {
-            gameManager.makeMove(at: position)
-            if gameManager.isGameOver {
-                triggerEvent(.gameOver)
-            } else {
-                triggerEvent(.toggleActivePlayer)
+            if !activePlayer.isAI {
+                gameManager.makeMove(at: position)
             }
-        }
-    }
-    
-    // Пример обработки события по истечении времени
-    private func handleOutOfTime() {
-        if stateMachine.currentState == .play {
-            triggerEvent(.outOfTime)
         }
     }
     
@@ -162,4 +160,9 @@ final class GameViewModel: ObservableObject {
     //           roundResults.append(resultString)
     //       }
     
+    private func formattedTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let seconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
 }

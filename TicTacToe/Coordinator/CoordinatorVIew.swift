@@ -11,6 +11,8 @@ struct CoordinatorView: View {
     @ObservedObject var coordinator = Coordinator()
     @AppStorage("themeMode") private var themeMode: ThemeMode = .system
     
+    let userManager = UserManager()
+    
     var body: some View {
         ZStack {
             switch coordinator.navigationState {
@@ -19,9 +21,9 @@ struct CoordinatorView: View {
             case .mainScreen:
                 StartView(coordinator: coordinator)
             case .selectGame:
-                GameSelectView(coordinator: coordinator)
+                GameSelectView(userManager: userManager, coordinator: coordinator)
             case .game:
-                GameView(coordinator: coordinator)
+                GameView(userManager: userManager, coordinator: coordinator)
             case .setting:
                 SettingGameView(coordinator: coordinator)
             case .rules:

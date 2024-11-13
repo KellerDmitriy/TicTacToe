@@ -11,8 +11,8 @@ struct GameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     @StateObject private var viewModel: GameViewModel
 
-    init(coordinator: Coordinator) {
-        self._viewModel = StateObject(wrappedValue: GameViewModel(coordinator: coordinator))
+    init(userManager: UserManager, coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameViewModel(userManager: userManager, coordinator: coordinator))
     }
     
     var body: some View {
@@ -68,5 +68,5 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView(coordinator: Coordinator())
+    GameView(userManager: UserManager(), coordinator: Coordinator())
 }

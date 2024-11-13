@@ -30,6 +30,7 @@ final class TimerManager {
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateCount), userInfo: nil, repeats: true)
     }
     
+    
     func stopTimer() {
         timer.invalidate()
     }

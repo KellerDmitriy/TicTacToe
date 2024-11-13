@@ -17,9 +17,12 @@ final class GameManager {
     var player: Player
     var opponent: Player
     
-    var activePlayer: Player
+    var activePlayer: Player {
+        return player.isActive ? player : opponent
+    }
+    
     var winner: Player? = nil
-  
+    
     var boardSize: BoardSize
     var level: DifficultyLevel
     var gameMode: GameMode { userManager.gameMode }
@@ -36,8 +39,7 @@ final class GameManager {
         
         self.player = userManager.getPlayer()
         self.opponent = userManager.getOpponent()
-        
-        self.activePlayer = player.isActive ? player : opponent
+        randomizeCurrentActivePlayer()
     }
     
     // MARK: - Game Reset
@@ -46,35 +48,41 @@ final class GameManager {
         self.gameBoard = Array(repeating: nil, count: totalCells)
         self.winner = nil
         self.isGameOver = false
-        self.activePlayer = player
+        randomizeCurrentActivePlayer()
         onBoardChange?(self.gameBoard)
     }
     
     // MARK: - Toggle Active Player
-    func toggleActivePlayer() {
-        userManager.togglePlayerActive()
-        activePlayer = player.isActive ? opponent : player
+    func togglePlayerActive() {
+        player.isActive.toggle()
+        opponent.isActive = !player.isActive
     }
     
+    private func randomizeCurrentActivePlayer() {
+        let isPlayerActive = Bool.random()
+        player.isActive = isPlayerActive
+        opponent.isActive = !isPlayerActive
+    }
+    
+    
     // MARK: - Perform Move
-        func makeMove(at position: Int) {
-            guard isValidMove(at: position) else { return }
-            gameBoard[position] = activePlayer.symbol
-            evaluateGameState()
-            onBoardChange?(self.gameBoard)
-            toggleActivePlayer()
-        }
-        
-        // MARK: - AI Move
+    func makeMove(at position: Int) {
+        guard isValidMove(at: position) else { return }
+        gameBoard[position] = activePlayer.symbol
+        evaluateGameState()
+        onBoardChange?(self.gameBoard)
+    }
+    
+    // MARK: - AI Move
     func aiMove() {
-            guard !isGameOver else { return }
-            if activePlayer.isAI {
-                aiDecision(for: activePlayer) { [weak self] move in
-                    guard let self = self, let move = move else { return }
-                    self.makeMove(at: move)
-                }
+        guard !isGameOver else { return }
+        if activePlayer.isAI {
+            aiDecision(for: activePlayer) { [weak self] move in
+                guard let self = self, let move = move else { return }
+                self.makeMove(at: move)
             }
         }
+    }
     
     // MARK: - Game Result and Pattern
     func getGameResult() -> GameResult {
@@ -94,7 +102,6 @@ final class GameManager {
         }
         return nil
     }
-    
     
     // MARK: - Private Methods
     private func aiDecision(for aiPlayer: Player, completion: @escaping (Int?) -> Void) {
@@ -210,16 +217,16 @@ final class GameManager {
     }
     
     func finalizeGameResult() {
-            if let winningPattern = getWinningPattern() {
-                winner = activePlayer
-                isGameOver = true
-                onGameOver?()
-            } else if isBoardFull() {
-                isGameOver = true
-                onGameOver?()
-            }
-            lockBoard()
+        if let winningPattern = getWinningPattern() {
+            winner = activePlayer
+            isGameOver = true
+            onGameOver?()
+        } else if isBoardFull() {
+            isGameOver = true
+            onGameOver?()
         }
+        lockBoard()
+    }
     
     private func lockBoard() {
         print("Игра завершена. Блокировка доски.")
