@@ -32,7 +32,8 @@ final class UserManager {
     func setPlayers(player1Name: String, player2Name: String?) {
         self.player.name = player1Name
         self.opponent.name = player2Name ?? Resources.Text.ai
-        if gameMode == .singlePlayer && player2Name == nil {
+        if gameMode != .twoPlayer && player2Name == nil {
+            gameMode = .singlePlayer
             opponent.isAI = true
         }
     }

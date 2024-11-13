@@ -29,6 +29,9 @@ final class GameViewModel: ObservableObject {
     var gameMode: GameMode
     var level: DifficultyLevel
     
+    var totalGameDuration: Int = 0
+    var roundResults: [String] = []
+    
     // MARK: - Computed Properties
     var activePlayer: Player { gameManager.activePlayer }
     var player: Player { gameManager.player }
@@ -90,7 +93,6 @@ final class GameViewModel: ObservableObject {
         }
     }
     
-    // Метод для обработки изменений состояния
     private func handleStateChange(_ state: StateMachine.GameState) {
         print("Текущее состояние: \(state)")
         currentState = state
@@ -107,13 +109,15 @@ final class GameViewModel: ObservableObject {
                 print("handleStateChange")
                 gameManager.aiMove()
             }
-            
+         
         case .gameOver:
             musicManager.stopMusic()
             timerManager.stopTimer()
             winningPattern = gameManager.getWinningPattern()
             updateScore()
+            saveGameResults()
             playFinalMusic()
+            totalGameDuration += secondsCount
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.navigateToResultScreen()
             }
@@ -154,11 +158,32 @@ final class GameViewModel: ObservableObject {
         }
     }
     
+    private func saveGameResults() {
+        storageManager.saveLeaderboardRound(player: player, opponent: opponent, durationRound: secondsCount)
+        storageManager.saveLeaderboardGame(
+            player: player,
+            opponent: opponent,
+            score: getGameScore(),
+            totalDuration: getGameDuration()
+        )
+    }
+    
+    //    MARK: - Methods for LiederBoard
+    private func getGameScore() -> String {
+        let gameScore = ("\(player.score) : \(opponent.score)")
+        return gameScore
+    }
+    
+    private func getGameDuration() -> String {
+        let gameDuration = "\(totalGameDuration) seconds"
+        return gameDuration
+    }
+    
     // MARK: - Result Recording
-    //       private func recordRoundResult() {
-    //           let resultString = "\(player.name) : \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
-    //           roundResults.append(resultString)
-    //       }
+    private func recordRoundResult() {
+        let resultString = "\(player.name): \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
+        roundResults.append(resultString)
+    }
     
     private func formattedTime(_ seconds: Int) -> String {
         let minutes = seconds / 60
