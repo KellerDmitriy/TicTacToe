@@ -26,8 +26,8 @@ struct GameSelectView: View {
     }
     
     // MARK: - Init
-    init(coordinator: Coordinator) {
-        self._viewModel = StateObject(wrappedValue: GameSelectViewModel(coordinator: coordinator))
+    init(userManager: UserManager, coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameSelectViewModel(userManager: userManager, coordinator: coordinator))
     }
     
     // MARK: - Body
@@ -162,6 +162,6 @@ struct GameSelectView: View {
 
 // MARK: - Preview
 #Preview {
-    GameSelectView(coordinator: Coordinator())
+    GameSelectView(userManager: UserManager(), coordinator: Coordinator())
 }
 

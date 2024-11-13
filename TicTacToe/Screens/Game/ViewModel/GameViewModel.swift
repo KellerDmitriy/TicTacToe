@@ -6,142 +6,133 @@
 //
 import Foundation
 
+@MainActor
 final class GameViewModel: ObservableObject {
     
     // MARK: - Published Properties
-    @Published private(set) var stateMachine: StateMachine
-    @Published var gameBoard: [PlayerSymbol?] = []
+    @Published private(set) var gameBoard: [PlayerSymbol?] = []
     @Published var secondsCount = 0
+    @Published var timerDisplay = "00:00"
+    @Published private(set) var currentState: StateMachine.GameState = .startGame
     
     // MARK: - Private Properties
+    private let stateMachine: StateMachine
     private let coordinator: Coordinator
     private var gameManager: GameManager
     private let userManager: UserManager
     private let timerManager: TimerManager
     private let musicManager: MusicManager
-    private let storageManager: StorageManager
     
-    private var roundResults: [String] = []
-    private var totalGameDuration = 0
+    private let storageManager = StorageManager.shared
     
-    // MARK: - Game Settings
-    var player: Player
-    var opponent: Player
     var boardSize: BoardSize
     var gameMode: GameMode
     var level: DifficultyLevel
     
+    var totalGameDuration: Int = 0
+    var roundResults: [String] = []
     
     // MARK: - Computed Properties
-    var currentPlayer: Player {
-        stateMachine.currentPlayer
-    }
-    
-    var timerDisplay: String {
-        let minutes = secondsCount / 60
-        let seconds = secondsCount % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
-    var currentScore: String {
-        "\(player.score) : \(opponent.score)"
-    }
-    
+    var activePlayer: Player { gameManager.activePlayer }
+    var player: Player { gameManager.player }
+    var opponent: Player { gameManager.opponent }
+    var currentScore: String { "\(player.score) : \(opponent.score)" }
+    var winningPattern: [Int]? = nil
     
     // MARK: - Initialization
-    init(coordinator: Coordinator,
-         userManager: UserManager = .shared,
-         storageManager: StorageManager = .shared
-    ) {
+    init(userManager: UserManager, coordinator: Coordinator) {
         self.coordinator = coordinator
         self.userManager = userManager
-        self.storageManager = storageManager
-        
         self.timerManager = TimerManager()
         self.musicManager = MusicManager()
         
-        player = userManager.getPlayer()
-        opponent = userManager.getOpponent()
-        
+        // Load game settings
         self.boardSize = storageManager.getSettings().boardSize
         self.gameMode = userManager.gameMode
         self.level = storageManager.getSettings().level
         
-        self.gameManager = GameManager(boardSize, level)
-        
-        self.stateMachine = StateMachine(
-            player,
-            opponent,
-            gameMode,
-            gameManager
-        )
+        // Initialize game manager and state machine
+        self.gameManager = GameManager(boardSize, level, userManager)
+        self.stateMachine = StateMachine(initialState: .startGame)
         
         setupGameBindings()
-        startGame()
+//        triggerEvent(.refresh)
+        handleStateChange(.startGame)
     }
     
-    // MARK: - Game Logic
-    func getWinningPattern() -> [Int]? {
-        stateMachine.winningPattern
-    }
-    
-    private func dispatch(_ event: StateMachine.GameEvent) {
-        let newState = stateMachine.reduce(state: stateMachine.currentState, event: event)
-        stateMachine.currentState = newState
-    }
-    
-    func processPlayerMove(at position: Int) {
-        dispatch(.move(position))
-    }
-
-    private func processAIMove() {
-        dispatch(.moveAI)
-    }
-    
-    private func startGame() {
-        musicManager.playMusic()
-        timerManager.startTimer()
-        gameManager.resetGame()
-        dispatch(.refresh)
-    }
-
-    private func stopGame() {
-        musicManager.stopMusic()
-        timerManager.stopTimer()
-        playFinalMusic()
-        updateScore()
-       
-        dispatch(.gameOver)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.navigateToResultScreen()
-        }
-    }
-    
-    // MARK: - Helpers
     private func setupGameBindings() {
+        stateMachine.onStateChange = { [weak self] newState in
+            self?.handleStateChange(newState)
+        }
+        
+        stateMachine.onToggleActivePlayer = { [weak self] in
+            self?.gameManager.togglePlayerActive()
+        }
+        
         gameManager.onBoardChange = { [weak self] updatedBoard in
             guard let self else { return }
             self.gameBoard = updatedBoard
-        
-            self.dispatch(.toggleActivePlayer)
-                
-            if self.currentPlayer.isAI {
-                    self.processAIMove()
-                }
-            }
+            self.triggerEvent(.toggleActivePlayer)
+            print("onBoardChange")
+            self.triggerEvent(.moveAI)
+        }
         
         gameManager.onGameOver = { [weak self] in
-                    self?.stopGame()
-                }
+            self?.triggerEvent(.gameOver)
+        }
         
         timerManager.onTimeChange = { [weak self] newTime in
             DispatchQueue.main.async {
                 self?.secondsCount = newTime
+                self?.timerDisplay = self?.formattedTime(newTime) ?? "00:00"
             }
         }
         
         timerManager.outOfTime = { [weak self] in
-            self?.dispatch(.outOfTime)
+            self?.triggerEvent(.outOfTime)
+        }
+    }
+    
+    private func handleStateChange(_ state: StateMachine.GameState) {
+        print("Текущее состояние: \(state)")
+        currentState = state
+        
+        switch state {
+        case .startGame:
+            gameManager.resetGame()
+            musicManager.playMusic()
+            timerManager.startTimer()
+            stateMachine.handle(event: .refresh)
+            
+        case .play:
+            if gameManager.activePlayer.isAI {
+                print("handleStateChange")
+                gameManager.aiMove()
+            }
+         
+        case .gameOver:
+            musicManager.stopMusic()
+            timerManager.stopTimer()
+            winningPattern = gameManager.getWinningPattern()
+            updateScore()
+            saveGameResults()
+            playFinalMusic()
+            totalGameDuration += secondsCount
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.navigateToResultScreen()
+            }
+        }
+    }
+    
+    func triggerEvent(_ event: StateMachine.GameEvent) {
+        stateMachine.handle(event: event)
+    }
+    
+    func processPlayerMove(at position: Int) {
+        if stateMachine.currentState == .play {
+            if !activePlayer.isAI {
+                gameManager.makeMove(at: position)
+            }
         }
     }
     
@@ -167,9 +158,36 @@ final class GameViewModel: ObservableObject {
         }
     }
     
+    private func saveGameResults() {
+        storageManager.saveLeaderboardRound(player: player, opponent: opponent, durationRound: secondsCount)
+        storageManager.saveLeaderboardGame(
+            player: player,
+            opponent: opponent,
+            score: getGameScore(),
+            totalDuration: getGameDuration()
+        )
+    }
+    
+    //    MARK: - Methods for LiederBoard
+    private func getGameScore() -> String {
+        let gameScore = ("\(player.score) : \(opponent.score)")
+        return gameScore
+    }
+    
+    private func getGameDuration() -> String {
+        let gameDuration = "\(totalGameDuration) seconds"
+        return gameDuration
+    }
+    
     // MARK: - Result Recording
     private func recordRoundResult() {
-        let resultString = "\(player.name) : \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
+        let resultString = "\(player.name): \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
         roundResults.append(resultString)
+    }
+    
+    private func formattedTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let seconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

@@ -7,7 +7,6 @@
 import Foundation
 
 final class UserManager {
-    public static let shared = UserManager()
     private let storageManager: StorageManager
     
     private var player: Player
@@ -16,7 +15,7 @@ final class UserManager {
     private(set) var gameMode: GameMode = .singlePlayer
     
     // Initializes the UserManager with a shared StorageManager
-    private init(storageManager: StorageManager = .shared) {
+    init(storageManager: StorageManager = .shared) {
         self.storageManager = storageManager
         
         // Initialize players with their default settings and scores
@@ -33,7 +32,8 @@ final class UserManager {
     func setPlayers(player1Name: String, player2Name: String?) {
         self.player.name = player1Name
         self.opponent.name = player2Name ?? Resources.Text.ai
-        if gameMode == .singlePlayer && player2Name == nil {
+        if gameMode != .twoPlayer && player2Name == nil {
+            gameMode = .singlePlayer
             opponent.isAI = true
         }
     }
@@ -43,7 +43,6 @@ final class UserManager {
         let settings = storageManager.getSettings()
         player.symbol = settings.playerSymbol ?? .x
         player.style = settings.selectedStyle ?? .crossPinkCirclePurple
-        randomizeCurrentActivePlayer()
         return player
     }
     
@@ -54,18 +53,7 @@ final class UserManager {
         opponent.style = settings.selectedStyle ?? .crossPinkCirclePurple
         return opponent
     }
-    
-    func togglePlayerActive() {
-        player.isActive.toggle()
-        opponent.isActive = !player.isActive
-    }
-    
-    private func randomizeCurrentActivePlayer() {
-        let isPlayerActive = Bool.random()
-        player.isActive = isPlayerActive
-        opponent.isActive = !isPlayerActive
-    }
-    
+
     // Updates the player's score
     func updatePlayerScore() {
         player.score += 1

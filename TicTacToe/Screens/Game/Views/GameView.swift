@@ -11,8 +11,8 @@ struct GameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     @StateObject private var viewModel: GameViewModel
 
-    init(coordinator: Coordinator) {
-        self._viewModel = StateObject(wrappedValue: GameViewModel(coordinator: coordinator))
+    init(userManager: UserManager, coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameViewModel(userManager: userManager, coordinator: coordinator))
     }
     
     var body: some View {
@@ -36,20 +36,20 @@ struct GameView: View {
                     PlayerSquareView(player: viewModel.opponent)
                 }
                 HStack {
-                    Image(getPlayerImageName(for: viewModel.currentPlayer))
+                    Image(getPlayerImageName(for: viewModel.activePlayer))
                         .resizable()
                         .frame(width: 54, height: 54)
-                    Text(viewModel.currentPlayer.name)
+                    Text(viewModel.activePlayer.name)
                      
                         .font(.basicTitle)
                 }
                 .padding(.top, 45)
                 GameFieldView(
                     gameBoard: viewModel.gameBoard,
-                    playerStyle: viewModel.currentPlayer.style,
+                    playerStyle: viewModel.activePlayer.style,
                     action: viewModel.processPlayerMove(at:),
                     boardSize: viewModel.boardSize,
-                    winningPattern: viewModel.getWinningPattern()
+                    winningPattern: viewModel.winningPattern
                 )
                 .padding(.top, 20)
                 Spacer()
@@ -68,5 +68,5 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView(coordinator: Coordinator())
+    GameView(userManager: UserManager(), coordinator: Coordinator())
 }

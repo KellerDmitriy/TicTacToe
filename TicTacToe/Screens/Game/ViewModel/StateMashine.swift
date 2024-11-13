@@ -4,17 +4,22 @@
 //
 //  Created by Келлер Дмитрий on 17.10.2024.
 //
-
 import Foundation
 
 final class StateMachine {
-    // MARK: - State and Event Enums
-    enum State {
+    typealias StateChangeHandler = (GameState) -> Void
+  
+    private(set) var currentState: GameState
+    
+    var onStateChange: StateChangeHandler?
+    var onToggleActivePlayer: (() -> Void)?
+    
+    enum GameState {
         case startGame
         case play
         case gameOver
     }
-    
+
     enum GameEvent {
         case refresh
         case move(_ position: Int)
@@ -24,78 +29,36 @@ final class StateMachine {
         case outOfTime
     }
     
-    // MARK: - Properties
-    private let gameManager: GameManager
-    private let gameMode: GameMode
-    
-    var currentState: State = .startGame
-    
-    var player: Player
-    var opponent: Player
-    var currentPlayer: Player
-    
-    var winningPattern: [Int]? = nil
-    var gameResult: GameResult?
-    var boardBlocked = false
-
-    
-    // MARK: - Initializer
-    init(_ player: Player,_ opponent: Player,_ gameMode: GameMode,_ gameManager: GameManager) {
-        self.player = player
-        self.opponent = opponent
-        self.gameMode = gameMode
-        self.gameManager = gameManager
-        self.currentPlayer = player
+    init(initialState: GameState) {
+        self.currentState = initialState
     }
+    
 
-    // MARK: - Reducer Logic
-    func reduce(state: State, event: GameEvent) -> State {
-        currentState = state
-        
+    func handle(event: GameEvent) {
         switch event {
-        case  .refresh:
-            self.resetGame()
-            
-        case .move(let position):
-            if !currentPlayer.isAI {
-                gameManager.makeMove(at: position, for: currentPlayer)
-            }
-            
-        case .moveAI:
-            guard gameMode == .singlePlayer else { return .play }
-            
-            if currentPlayer.isAI {
-                gameManager.aiMove(for: currentPlayer)
-            }
-            
         case .toggleActivePlayer:
-            player.isActive.toggle()
-            opponent.isActive = !player.isActive
-            currentPlayer = player.isActive ? player : opponent
-            return .play
+            onToggleActivePlayer?()
             
-        case .outOfTime:
-            finishGame()
-            return .gameOver
-            
-        case .gameOver:
-            finishGame()
-            return .gameOver
+        default:
+            if let newState = nextState(from: currentState, event: event) {
+                currentState = newState
+                onStateChange?(newState)
+            }
         }
-        return currentState
-    }
-    
-    // MARK: - Game Reset Methods
-    func resetGame() {
-        winningPattern = nil
-        boardBlocked = false
-    }
-    
-    // MARK: - Finish Game Logic
-    private func finishGame() {
-        gameResult = gameManager.getGameResult(currentPlayer)
-        boardBlocked = true
-        winningPattern = gameManager.getWinningPattern()
     }
 
+    func nextState(from state: GameState, event: GameEvent) -> GameState? {
+        switch (state, event) {
+        case (.startGame, .refresh):
+            return .play
+        case (.play, .move), (.play, .moveAI), (.play, .toggleActivePlayer):
+            return .play
+        case (.play, .gameOver), (.play, .outOfTime):
+            return .gameOver
+        case (.gameOver, .refresh):
+            return .startGame
+        default:
+            return nil
+        }
+    }
 }

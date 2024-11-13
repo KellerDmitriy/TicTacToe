@@ -9,53 +9,37 @@ import Foundation
 
 final class GameManager {
     
+    // MARK: - Properties
     private(set) var gameBoard: [PlayerSymbol?] = []
     private(set) var isGameOver: Bool = false
+    private let userManager: UserManager
+    
+    var player: Player
+    var opponent: Player
+    
+    var activePlayer: Player {
+        return player.isActive ? player : opponent
+    }
+    
+    var winner: Player? = nil
     
     var boardSize: BoardSize
     var level: DifficultyLevel
-    var winner: Player? = nil
+    var gameMode: GameMode { userManager.gameMode }
+    
     var onBoardChange: (([PlayerSymbol?]) -> Void)?
     var onGameOver: (() -> Void)?
     
-    
-    // MARK: - Winning Patterns
-    private var winningCombinations: [[Int]] {
-        let size = boardSize.dimension
-        var combinations: [[Int]] = []
+    // MARK: - Initialization
+    init(_ boardSize: BoardSize,_ level: DifficultyLevel,_ userManager: UserManager) {
+        self.userManager = userManager
         
-        // Horizontal
-        for row in 0..<size {
-            let start = row * size
-            combinations.append(Array(start..<(start + size)))
-        }
-        
-        // Vertical
-        for col in 0..<size {
-            var combination: [Int] = []
-            for row in 0..<size {
-                combination.append(row * size + col)
-            }
-            combinations.append(combination)
-        }
-        
-        // Diagonal
-        var diagonal1: [Int] = []
-        var diagonal2: [Int] = []
-        for i in 0..<size {
-            diagonal1.append(i * size + i)
-            diagonal2.append(i * size + (size - i - 1))
-        }
-        combinations.append(diagonal1)
-        combinations.append(diagonal2)
-        
-        return combinations
-    }
-    
-    // MARK: - Init
-    init(_ boardSize: BoardSize,_ level: DifficultyLevel ) {
         self.boardSize = boardSize
         self.level = level
+        
+        self.player = userManager.getPlayer()
+        self.opponent = userManager.getOpponent()
+        randomizeCurrentActivePlayer()
     }
     
     // MARK: - Game Reset
@@ -64,50 +48,52 @@ final class GameManager {
         self.gameBoard = Array(repeating: nil, count: totalCells)
         self.winner = nil
         self.isGameOver = false
+        randomizeCurrentActivePlayer()
         onBoardChange?(self.gameBoard)
+    }
+    
+    // MARK: - Toggle Active Player
+    func togglePlayerActive() {
+        player.isActive.toggle()
+        opponent.isActive = !player.isActive
+    }
+    
+    private func randomizeCurrentActivePlayer() {
+        let isPlayerActive = Bool.random()
+        player.isActive = isPlayerActive
+        opponent.isActive = !isPlayerActive
     }
     
     
     // MARK: - Perform Move
-    func makeMove(at position: Int, for player: Player) {
+    func makeMove(at position: Int) {
         guard isValidMove(at: position) else { return }
-        gameBoard[position] = player.symbol
-        evaluateGameState(for: player)
+        gameBoard[position] = activePlayer.symbol
+        evaluateGameState()
         onBoardChange?(self.gameBoard)
-        print("\(player.name) сделал ход на позицию: \(position)")
     }
     
     // MARK: - AI Move
-    func aiMove(for aiPlayer: Player) {
+    func aiMove() {
         guard !isGameOver else { return }
-        
-        aiDecision(for: aiPlayer) { [weak self] move in
-            guard let self = self else {
-                return
+        if activePlayer.isAI {
+            aiDecision(for: activePlayer) { [weak self] move in
+                guard let self = self, let move = move else { return }
+                self.makeMove(at: move)
             }
-            guard let move = move else {
-                return
-            }
-            self.performAIMove(aiPlayer, at: move)
-            evaluateGameState(for: aiPlayer)
-            onBoardChange?(self.gameBoard)
-            print("AI сделал ход на позицию: \(move)")
         }
     }
     
     // MARK: - Game Result and Pattern
-    func getGameResult(_ currentPlayer: Player) -> GameResult {
+    func getGameResult() -> GameResult {
         if let winner = winner {
-            if winner == currentPlayer && currentPlayer.isAI {
-                return .lose
-            } else {
-                return .win(name: winner.name)
-            }
+            return .win(name: winner.name)
         } else {
             return .draw
         }
     }
     
+    // MARK: - Check Winning Patterns
     func getWinningPattern() -> [Int]? {
         for combination in winningCombinations {
             if combination.allSatisfy({ gameBoard[$0] != nil && gameBoard[$0] == gameBoard[combination[0]] }) {
@@ -140,42 +126,11 @@ final class GameManager {
         }
     }
     
+    // MARK: - Winning/Available Moves Helpers
     private func opponentSymbol(for aiSymbol: PlayerSymbol) -> PlayerSymbol {
         return aiSymbol == .x ? .o : .x
     }
     
-    // MARK: - Perform AI Move
-    private func performAIMove(_ aiPlayer: Player, at position: Int) {
-        gameBoard[position] = aiPlayer.symbol
-    }
-    
-    // MARK: - Validation and Evaluation
-    private func isValidMove(at position: Int) -> Bool {
-        return position >= 0 && position < gameBoard.count && gameBoard[position] == nil && !isGameOver
-    }
-    
-    private func evaluateGameState(for player: Player) {
-        if checkWin(for: player.symbol) {
-            winner = player
-            isGameOver = true
-            onGameOver?()
-        } else if isBoardFull() {
-            isGameOver = true
-            onGameOver?() 
-        }
-    }
-    
-    private func checkWin(for symbol: PlayerSymbol) -> Bool {
-        return winningCombinations.contains { pattern in
-            pattern.allSatisfy { gameBoard[$0] == symbol }
-        }
-    }
-    
-    private func isBoardFull() -> Bool {
-        return gameBoard.allSatisfy { $0 != nil }
-    }
-    
-    // MARK: - Winning/Available Moves Helpers
     private func findWinningMove(for symbol: PlayerSymbol) -> Int? {
         for pattern in winningCombinations {
             let values = pattern.map { gameBoard[$0] }
@@ -185,6 +140,10 @@ final class GameManager {
             }
         }
         return nil
+    }
+    
+    private func findFirstAvailableMove() -> Int? {
+        return gameBoard.firstIndex(where: { $0 == nil })
     }
     
     private func findCenterMove() -> Int? {
@@ -198,7 +157,78 @@ final class GameManager {
         return corners.first(where: { gameBoard[$0] == nil })
     }
     
-    private func findFirstAvailableMove() -> Int? {
-        return gameBoard.firstIndex(where: { $0 == nil })
+    
+    private func performAIMove(at position: Int) {
+        gameBoard[position] = activePlayer.symbol
+    }
+    
+    private func isValidMove(at position: Int) -> Bool {
+        return position >= 0 && position < gameBoard.count && gameBoard[position] == nil && !isGameOver
+    }
+    
+    private func evaluateGameState() {
+        if checkWin(for: activePlayer.symbol) {
+            winner = activePlayer
+            isGameOver = true
+            onGameOver?()
+        } else if isBoardFull() {
+            isGameOver = true
+            onGameOver?()
+        }
+    }
+    
+    private func checkWin(for symbol: PlayerSymbol) -> Bool {
+        return winningCombinations.contains { pattern in
+            pattern.allSatisfy { gameBoard[$0] == symbol }
+        }
+    }
+    
+    private func isBoardFull() -> Bool {
+        return gameBoard.allSatisfy { $0 != nil }
+    }
+    
+    private var winningCombinations: [[Int]] {
+        let size = boardSize.dimension
+        var combinations: [[Int]] = []
+        
+        for row in 0..<size {
+            let start = row * size
+            combinations.append(Array(start..<(start + size)))
+        }
+        
+        for col in 0..<size {
+            var combination: [Int] = []
+            for row in 0..<size {
+                combination.append(row * size + col)
+            }
+            combinations.append(combination)
+        }
+        
+        var diagonal1: [Int] = []
+        var diagonal2: [Int] = []
+        for i in 0..<size {
+            diagonal1.append(i * size + i)
+            diagonal2.append(i * size + (size - i - 1))
+        }
+        combinations.append(diagonal1)
+        combinations.append(diagonal2)
+        
+        return combinations
+    }
+    
+    func finalizeGameResult() {
+        if let winningPattern = getWinningPattern() {
+            winner = activePlayer
+            isGameOver = true
+            onGameOver?()
+        } else if isBoardFull() {
+            isGameOver = true
+            onGameOver?()
+        }
+        lockBoard()
+    }
+    
+    private func lockBoard() {
+        print("Игра завершена. Блокировка доски.")
     }
 }
