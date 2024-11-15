@@ -13,7 +13,7 @@ struct ToolBarView: View {
     
     var showRightButton: Bool = false
     var rightButtonAction: (() -> Void)?
-    
+    var rightButtonImage: ImageResource? = .settingsIcon
     var title: String
     
     var body: some View {
@@ -45,7 +45,8 @@ struct ToolBarView: View {
                 Button(action: {
                     rightButtonAction()
                 }) {
-                    Image(.settingsIcon)
+                    Image(rightButtonImage ?? .rulesIcon)
+                        .frame(width: 38, height: 38)
                         .foregroundStyle(.basicBlack)
                 }
                 .padding(.trailing, 16)

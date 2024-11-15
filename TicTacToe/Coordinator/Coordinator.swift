@@ -7,6 +7,9 @@
 
 import Foundation
 final class Coordinator: ObservableObject {
+    @Published var navigationState: NavigationState = .launchScreen
+    private var previousState: NavigationState = .mainScreen
+    var userManager: UserManager = UserManager()
     
     enum NavigationState: Equatable {
         case launchScreen
@@ -31,8 +34,7 @@ final class Coordinator: ObservableObject {
         case backFromSettings
     }
     
-    @Published var navigationState: NavigationState = .launchScreen
-    private var previousState: NavigationState = .mainScreen
+
     
     private func reduce(_ state: NavigationState, action: CoordinatorAction) -> NavigationState {
         
@@ -42,6 +44,7 @@ final class Coordinator: ObservableObject {
         case .showLaunchScreen:
             newState = .launchScreen
         case .showMainScreen:
+            resetUserManager()
             newState = .mainScreen
         case .selectGame:
             newState = .selectGame
@@ -68,5 +71,9 @@ final class Coordinator: ObservableObject {
                 navigationState = reduce(navigationState, action: action)
             }
         }
+    }
+    
+    func resetUserManager() {
+        userManager = UserManager()
     }
 }

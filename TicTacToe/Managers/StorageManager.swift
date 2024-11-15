@@ -100,5 +100,9 @@ final class StorageManager {
             return []
         }
     }
+    
+    func deleteLeaderboardGames() {
+        userDefaults.removeObject(forKey: UserDefaultKeys.savedLeaderboardGames)
+    }
 }
 

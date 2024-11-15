@@ -20,6 +20,8 @@ enum Resources {
         static let enterYourNameAlert = "Please enter name"
         static let leaderboard = "Leaderboard"
         static let leaderboardEmptyMessage = "No game history"
+        
+        static let leaderboardWarning = "The entire leaderboard will be cleared"
         static let letsPlay = "Let's play"
         static let loseResult = "You lose!"
         static let next = "Next"

@@ -17,10 +17,6 @@ final class GameManager {
     var player: Player
     var opponent: Player
     
-    var activePlayer: Player {
-        return player.isActive ? player : opponent
-    }
-    
     var winner: Player? = nil
     
     var boardSize: BoardSize
@@ -29,6 +25,10 @@ final class GameManager {
     
     var onBoardChange: (([PlayerSymbol?]) -> Void)?
     var onGameOver: (() -> Void)?
+    
+    var activePlayer: Player {
+        return player.isActive ? player : opponent
+    }
     
     // MARK: - Initialization
     init(_ boardSize: BoardSize,_ level: DifficultyLevel,_ userManager: UserManager) {
@@ -50,6 +50,11 @@ final class GameManager {
         self.isGameOver = false
         randomizeCurrentActivePlayer()
         onBoardChange?(self.gameBoard)
+    }
+    
+    func updatePlayers() {
+        self.player = userManager.getPlayer()
+        self.opponent = userManager.getOpponent()
     }
     
     // MARK: - Toggle Active Player
@@ -217,7 +222,7 @@ final class GameManager {
     }
     
     func finalizeGameResult() {
-        if let winningPattern = getWinningPattern() {
+        if getWinningPattern() != nil {
             winner = activePlayer
             isGameOver = true
             onGameOver?()

@@ -155,6 +155,7 @@ final class GameViewModel: ObservableObject {
             ? userManager.updatePlayerScore()
             : userManager.updateOpponentScore()
         }
+        gameManager.updatePlayers()
     }
     
     private func saveGameResults() {

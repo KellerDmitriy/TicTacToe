@@ -38,6 +38,11 @@ final class LeaderboardViewModel: ObservableObject {
         bestGames.sort {$0.player.score > $1.player.score}
     }
     
+    func deleteAll() {
+        bestGames.removeAll()
+        storageManager.deleteLeaderboardGames()
+    }
+    
     //MARK: - NavigationState
     func dismissLeaderboard() {
         coordinator.updateNavigationState(action: .showMainScreen)

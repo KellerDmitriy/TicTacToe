@@ -11,8 +11,6 @@ struct CoordinatorView: View {
     @ObservedObject var coordinator = Coordinator()
     @AppStorage("themeMode") private var themeMode: ThemeMode = .system
     
-    let userManager = UserManager()
-    
     var body: some View {
         ZStack {
             switch coordinator.navigationState {
@@ -21,9 +19,9 @@ struct CoordinatorView: View {
             case .mainScreen:
                 StartView(coordinator: coordinator)
             case .selectGame:
-                GameSelectView(userManager: userManager, coordinator: coordinator)
+                GameSelectView(userManager: coordinator.userManager, coordinator: coordinator)
             case .game:
-                GameView(userManager: userManager, coordinator: coordinator)
+                GameView(userManager: coordinator.userManager, coordinator: coordinator)
             case .setting:
                 SettingGameView(coordinator: coordinator)
             case .rules:
@@ -39,4 +37,6 @@ struct CoordinatorView: View {
         .transition(.opacity)
         .animation(.easeInOut(duration: 0.3), value: coordinator.navigationState)
     }
+    
+
 }
