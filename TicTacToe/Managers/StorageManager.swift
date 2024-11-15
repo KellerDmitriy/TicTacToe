@@ -103,6 +103,7 @@ final class StorageManager {
     
     func deleteLeaderboardGames() {
         userDefaults.removeObject(forKey: UserDefaultKeys.savedLeaderboardGames)
+        userDefaults.removeObject(forKey: UserDefaultKeys.savedLeaderboardRounds)
     }
 }
 

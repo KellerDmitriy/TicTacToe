@@ -61,6 +61,7 @@ struct GameSelectView: View {
                         showCustomAlert = false
                     }
                 }
+                .frame(width: 300, height: 200)
                 .background(Color.basicBlack.opacity(0.4).edgesIgnoringSafeArea(.all))
                 .cornerRadius(Drawing.cornerRadius)
                 .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))

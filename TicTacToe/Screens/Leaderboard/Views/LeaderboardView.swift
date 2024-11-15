@@ -53,21 +53,26 @@ struct LeaderboardView: View {
             }
             .blur(radius: showCustomAlert ? 5 : 0)
             if showCustomAlert {
-                CustomAlertView(message: Resources.Text.leaderboardWarning.localized(language)) {
-                    withAnimation(.easeInOut) {
-                        showCustomAlert = false
-                        viewModel.deleteAll()
+                CustomAlertView(
+                    message: Resources.Text.leaderboardWarning.localized(language),
+                    onDismiss: {
+                        withAnimation(.easeInOut) {
+                            showCustomAlert = false
+                            viewModel.deleteAll()
+                        }
+                    },
+                    showSecondButton: true,
+                    secondButtonAction: {
+                        withAnimation(.easeInOut) {
+                            showCustomAlert = false
+                        }
                     }
-                }
+                )
+                .frame(width: 300, height: 400)
                 .background(Color.basicBlack.opacity(0.4).edgesIgnoringSafeArea(.all))
                 .cornerRadius(Drawing.cornerRadius)
                 .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
                 .zIndex(2)
-            }
-        }
-        .onChange(of: showCustomAlert) { newValue in
-            withAnimation(.easeInOut) {
-                showCustomAlert = newValue
             }
         }
     }
