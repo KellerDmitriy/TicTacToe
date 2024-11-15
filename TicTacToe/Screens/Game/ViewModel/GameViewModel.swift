@@ -108,9 +108,10 @@ final class GameViewModel: ObservableObject {
             timerManager.stopTimer()
             winningPattern = gameManager.getWinningPattern()
             updateScore()
-            saveGameResults()
             playFinalMusic()
             gameManager.player.totalGameDuration += secondsCount
+            saveGameResults()
+         
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.navigateToResultScreen()
             }
@@ -149,10 +150,10 @@ final class GameViewModel: ObservableObject {
             ? userManager.updatePlayerScore()
             : userManager.updateOpponentScore()
         }
-        gameManager.updatePlayers()
     }
     
     private func saveGameResults() {
+        gameManager.updatePlayers()
         if let winner = gameManager.winner {
             storageManager.saveLeaderboardRound(
                 winner: winner,
@@ -162,8 +163,7 @@ final class GameViewModel: ObservableObject {
         storageManager.saveLeaderboardGame(
             player: player,
             opponent: opponent,
-            score: getGameScore(),
-            totalDuration: getGameDuration()
+            score: getGameScore()
         )
     }
     
@@ -171,11 +171,6 @@ final class GameViewModel: ObservableObject {
     private func getGameScore() -> String {
         let gameScore = ("\(player.totalWins) : \(opponent.totalWins)")
         return gameScore
-    }
-    
-    private func getGameDuration() -> String {
-        let gameDuration = "\(player.totalGameDuration) seconds"
-        return gameDuration
     }
     
     // MARK: - Helpers

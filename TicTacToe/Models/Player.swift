@@ -54,16 +54,14 @@ struct LeaderboardGame: Codable, Identifiable {
     let player: Player
     let opponent: Player
     let score: String
-    let totalDuration: String
     let date: Date
 
     // MARK: - Initializer
-    init(player: Player, opponent: Player, score: String, totalDuration: String) {
+    init(player: Player, opponent: Player, score: String) {
         self.id = UUID()
         self.player = player
         self.opponent = opponent
         self.score = score
-        self.totalDuration = totalDuration
         self.date = Date()
     }
 }

@@ -68,14 +68,13 @@ final class StorageManager {
     }
     
     // MARK: - Leaderboard for Games
-    func saveLeaderboardGame(player: Player, opponent: Player, score: String, totalDuration: String) {
+    func saveLeaderboardGame(player: Player, opponent: Player, score: String) {
         var leaderboardGames = getLeaderboardGames()
         
         let leaderboardEntry = LeaderboardGame(
             player: player,
             opponent: opponent,
-            score: score,
-            totalDuration: totalDuration
+            score: score
         )
         
         if let existingIndex = leaderboardGames.firstIndex(where: { $0.player.id == leaderboardEntry.player.id }) {
