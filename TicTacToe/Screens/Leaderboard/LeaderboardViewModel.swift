@@ -32,7 +32,7 @@ final class LeaderboardViewModel: ObservableObject {
     
     private func getBestGames() {
         bestGames = storageManager.getLeaderboardGames()
-        bestGames.sort { $0.player.score > $1.player.score }
+        bestGames.sort { $0.player.totalWins > $1.player.totalWins }
     }
     
     func deleteAll() {

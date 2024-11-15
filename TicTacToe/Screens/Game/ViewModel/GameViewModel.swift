@@ -29,14 +29,11 @@ final class GameViewModel: ObservableObject {
     var gameMode: GameMode
     var level: DifficultyLevel
     
-    var totalGameDuration: Int = 0
-    var roundResults: [String] = []
-    
     // MARK: - Computed Properties
     var activePlayer: Player { gameManager.activePlayer }
     var player: Player { gameManager.player }
     var opponent: Player { gameManager.opponent }
-    var currentScore: String { "\(player.score) : \(opponent.score)" }
+    var currentScore: String { "\(player.totalWins) : \(opponent.totalWins)" }
     var winningPattern: [Int]? = nil
     
     // MARK: - Initialization
@@ -72,7 +69,6 @@ final class GameViewModel: ObservableObject {
             guard let self else { return }
             self.gameBoard = updatedBoard
             self.triggerEvent(.toggleActivePlayer)
-            print("onBoardChange")
             self.triggerEvent(.moveAI)
         }
         
@@ -93,7 +89,6 @@ final class GameViewModel: ObservableObject {
     }
     
     private func handleStateChange(_ state: StateMachine.GameState) {
-        print("Текущее состояние: \(state)")
         currentState = state
         
         switch state {
@@ -105,7 +100,6 @@ final class GameViewModel: ObservableObject {
             
         case .play:
             if gameManager.activePlayer.isAI {
-                print("handleStateChange")
                 gameManager.aiMove()
             }
          
@@ -116,7 +110,7 @@ final class GameViewModel: ObservableObject {
             updateScore()
             saveGameResults()
             playFinalMusic()
-            totalGameDuration += secondsCount
+            gameManager.player.totalGameDuration += secondsCount
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.navigateToResultScreen()
             }
@@ -159,11 +153,14 @@ final class GameViewModel: ObservableObject {
     }
     
     private func saveGameResults() {
-        storageManager.saveLeaderboardRound(
-            player: player,
-            opponent: opponent,
-            durationRound: secondsCount
-        )
+        if let winner = gameManager.winner {
+            storageManager.saveLeaderboardRound(
+                winner: winner,
+                player: player,
+                opponent: opponent,
+                durationRound: secondsCount
+            )
+        }
         storageManager.saveLeaderboardGame(
             player: player,
             opponent: opponent,
@@ -174,21 +171,16 @@ final class GameViewModel: ObservableObject {
     
     //    MARK: - Methods for LiederBoard
     private func getGameScore() -> String {
-        let gameScore = ("\(player.score) : \(opponent.score)")
+        let gameScore = ("\(player.totalWins) : \(opponent.totalWins)")
         return gameScore
     }
     
     private func getGameDuration() -> String {
-        let gameDuration = "\(totalGameDuration) seconds"
+        let gameDuration = "\(player.totalGameDuration) seconds"
         return gameDuration
     }
     
-    // MARK: - Result Recording
-    private func recordRoundResult() {
-        let resultString = "\(player.name): \(player.score) - \(opponent.name) : \(opponent.score) (Duration: \(totalGameDuration) seconds)"
-        roundResults.append(resultString)
-    }
-    
+    // MARK: - Helpers
     private func formattedTime(_ seconds: Int) -> String {
         let minutes = seconds / 60
         let seconds = seconds % 60

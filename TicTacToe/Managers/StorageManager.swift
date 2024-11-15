@@ -38,13 +38,14 @@ final class StorageManager {
     }
     
     // MARK: - Leaderboard for Rounds
-    func saveLeaderboardRound(player: Player, opponent: Player, durationRound: Int) {
+    func saveLeaderboardRound(winner: Player, player: Player, opponent: Player, durationRound: Int) {
         var leaderboardRounds = getLeaderboardRounds()
         
         let leaderboardEntry = LeaderboardRound(
             player: player,
             opponent: opponent,
-            durationRound: durationRound
+            durationRound: durationRound,
+            winner: winner
         )
         
         leaderboardRounds.append(leaderboardEntry)

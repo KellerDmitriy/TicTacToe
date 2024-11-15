@@ -56,11 +56,11 @@ final class UserManager {
 
     // Updates the player's score
     func updatePlayerScore() {
-        player.score += 1
+        player.totalWins += 1
     }
     
     // Updates the opponent's score
     func updateOpponentScore() {
-        opponent.score += 1
+        opponent.totalWins += 1
     }
 }
