@@ -38,14 +38,12 @@ final class StorageManager {
     }
     
     // MARK: - Leaderboard for Rounds
-    func saveLeaderboardRound(winner: Player, player: Player, opponent: Player, durationRound: Int) {
+    func saveLeaderboardRound(winner: Player, durationRound: Int) {
         var leaderboardRounds = getLeaderboardRounds()
         
         let leaderboardEntry = LeaderboardRound(
-            player: player,
-            opponent: opponent,
-            durationRound: durationRound,
-            winner: winner
+            winner: winner,
+            durationRound: durationRound
         )
         
         leaderboardRounds.append(leaderboardEntry)
@@ -80,10 +78,14 @@ final class StorageManager {
             totalDuration: totalDuration
         )
         
-        leaderboardGames.append(leaderboardEntry)
+        if let existingIndex = leaderboardGames.firstIndex(where: { $0.player.id == leaderboardEntry.player.id }) {
+            leaderboardGames[existingIndex] = leaderboardEntry
+        } else {
+            leaderboardGames.append(leaderboardEntry)
+        }
         
-        // Сохранение лучших игр, можно использовать отсечку, например, 7 лучших
         leaderboardGames.sort { $0.score > $1.score }
+        
         if leaderboardGames.count > 7 {
             leaderboardGames = Array(leaderboardGames.prefix(7))
         }

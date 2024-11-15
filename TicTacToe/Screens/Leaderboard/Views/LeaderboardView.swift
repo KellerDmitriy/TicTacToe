@@ -94,6 +94,7 @@ struct LeaderboardView: View {
         VStack(spacing: Drawing.roundsSectionBottomPadding) {
             if let bestRound = viewModel.bestRound {
                 RoundRow(round: bestRound)
+                
             }
         }
         .padding(.bottom, Drawing.roundsSectionBottomPadding)

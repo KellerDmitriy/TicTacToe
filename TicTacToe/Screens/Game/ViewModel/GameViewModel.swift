@@ -156,8 +156,6 @@ final class GameViewModel: ObservableObject {
         if let winner = gameManager.winner {
             storageManager.saveLeaderboardRound(
                 winner: winner,
-                player: player,
-                opponent: opponent,
                 durationRound: secondsCount
             )
         }

@@ -35,20 +35,16 @@ struct Player: Equatable, Codable {
 // MARK: - LeaderboardRound Struct
 struct LeaderboardRound: Codable, Equatable {
     let id: UUID
-    let player: Player
-    let opponent: Player
+    let winner: Player
     let date: Date
     let durationRound: Int
-    let winner: Player
 
     // MARK: - Initializer
-    init(player: Player, opponent: Player, durationRound: Int, winner: Player) {
+    init(winner: Player, durationRound: Int) {
         self.id = UUID()
-        self.player = player
-        self.opponent = opponent
+        self.winner = winner
         self.durationRound = durationRound
         self.date = Date()
-        self.winner = winner
     }
 }
 

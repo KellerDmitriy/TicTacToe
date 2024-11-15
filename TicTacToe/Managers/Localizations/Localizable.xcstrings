@@ -27,12 +27,22 @@
     "%@" : {
 
     },
-    "%@: %lld" : {
+    "%@: %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$lld"
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@: %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld %3$@"
           }
         }
       }
@@ -669,6 +679,17 @@
         }
       }
     },
+    "sec" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сек"
+          }
+        }
+      }
+    },
     "Second Player" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -843,6 +864,17 @@
         }
       }
     },
+    "time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "время"
+          }
+        }
+      }
+    },
     "Time:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -884,6 +916,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Предупреждение"
+          }
+        }
+      }
+    },
+    "Winner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Победитель"
           }
         }
       }
