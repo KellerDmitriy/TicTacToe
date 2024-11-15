@@ -6,21 +6,32 @@
 //
 import Foundation
 
+// MARK: - StateMachine Class
 final class StateMachine {
+    
+    // MARK: - Typealiases
     typealias StateChangeHandler = (GameState) -> Void
-  
+    
+    // MARK: - Properties
     private(set) var currentState: GameState
     
+    // MARK: - Closures
     var onStateChange: StateChangeHandler?
     var onToggleActivePlayer: (() -> Void)?
     
+    // MARK: - Initialization
+    init(initialState: GameState) {
+        self.currentState = initialState
+    }
+    
+    // MARK: - Enums
     enum GameState {
         case startGame
         case play
         case gameOver
     }
-
-    enum GameEvent {
+    
+    enum GameEvent: Equatable {
         case refresh
         case move(_ position: Int)
         case moveAI
@@ -29,25 +40,19 @@ final class StateMachine {
         case outOfTime
     }
     
-    init(initialState: GameState) {
-        self.currentState = initialState
-    }
-    
-
+    // MARK: - Event Handling
     func handle(event: GameEvent) {
-        switch event {
-        case .toggleActivePlayer:
+        // Handle the toggle event separately
+        if event == .toggleActivePlayer {
             onToggleActivePlayer?()
-            
-        default:
-            if let newState = nextState(from: currentState, event: event) {
-                currentState = newState
-                onStateChange?(newState)
-            }
+        } else if let newState = nextState(from: currentState, event: event) {
+            currentState = newState
+            onStateChange?(newState)
         }
     }
-
-    func nextState(from state: GameState, event: GameEvent) -> GameState? {
+    
+    // MARK: - State Transition Logic
+    private func nextState(from state: GameState, event: GameEvent) -> GameState? {
         switch (state, event) {
         case (.startGame, .refresh):
             return .play

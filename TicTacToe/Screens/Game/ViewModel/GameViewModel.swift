@@ -56,7 +56,6 @@ final class GameViewModel: ObservableObject {
         self.stateMachine = StateMachine(initialState: .startGame)
         
         setupGameBindings()
-//        triggerEvent(.refresh)
         handleStateChange(.startGame)
     }
     
@@ -159,7 +158,11 @@ final class GameViewModel: ObservableObject {
     }
     
     private func saveGameResults() {
-        storageManager.saveLeaderboardRound(player: player, opponent: opponent, durationRound: secondsCount)
+        storageManager.saveLeaderboardRound(
+            player: player,
+            opponent: opponent,
+            durationRound: secondsCount
+        )
         storageManager.saveLeaderboardGame(
             player: player,
             opponent: opponent,
