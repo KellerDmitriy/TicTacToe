@@ -8,82 +8,101 @@
 import SwiftUI
 
 struct GameRow: View {
+    // MARK: - Properties
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-    enum DrawingConstants {
+    
+    // MARK: - Drawing Constants
+    enum Drawing {
         static let circleSize: CGFloat = 38
+        static let imageSize: CGFloat = 20
+        static let spacing: CGFloat = 4
+        static let horizontalPadding: CGFloat = 4
+        static let dividerOpacity: CGFloat = 0.6
     }
     
     let game: LeaderboardGame
     let rank: Int
     
+    // MARK: - Computed Properties
     private var formattedDate: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
         return dateFormatter.string(from: game.date)
     }
     
+    // MARK: - Body
     var body: some View {
-        
         LightBlueBackgroundView {
             HStack {
                 ZStack {
                     Circle()
                         .fill(Color.secondaryPurple)
-                        .frame(width: DrawingConstants.circleSize, height: DrawingConstants.circleSize)
+                        .frame(width: Drawing.circleSize, height: Drawing.circleSize)
                     Text("\(rank)")
                         .font(.number)
                         .foregroundStyle(.basicBlack)
                 }
-                VStack {
-                    HStack {
-                        HStack(spacing: 4) {
-                            Image(game.player.symbol ==
-                                .x ? game.player.style.imageNames.player1
-                                  : game.player.style.imageNames.player2)
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .scaledToFit()
-                            .padding(.leading, 4)
-                            Text(game.player.name)
-                                .font(.basicSubtitle)
-                                .foregroundStyle(.basicBlack)
-                                .multilineTextAlignment(.center)
-                            Text(" / ")
-                                .font(.basicSubtitle)
-                                .foregroundStyle(.basicBlack)
-                                .multilineTextAlignment(.center)
-                            Image(game.opponent.symbol ==
-                                .x ? game.player.style.imageNames.player1
-                                  : game.player.style.imageNames.player2)
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .scaledToFit()
-                            .padding(.leading, 4)
-                            Text(game.opponent.name)
-                                .font(.basicSubtitle)
-                                .foregroundStyle(.basicBlack)
-                                .multilineTextAlignment(.center)
-                        }
-                        Spacer()
-                        VStack {
-                            Text("\(game.score)")
-                                .font(.basicSubtitle)
-                                .padding(.horizontal, 4)
-                                .foregroundStyle(.basicBlack)
-                            Text("\(formattedDate)")
-                                .font(.caption)
-                                .padding(.horizontal, 4)
-                                .foregroundStyle(.basicBlue)
-                        }
-                    }
+                VStack(alignment: .leading) {
+                    playerInfoRow
                     Divider()
-                    Text("\(game.player.totalGameDuration) \(Resources.Text.sec.localized(language))")
-                        .font(.basicSubtitle)
-                        .padding(.horizontal, 4)
-                        .foregroundStyle(.basicBlack)
+                        .background(Color.gray.opacity(Drawing.dividerOpacity))
+                    durationRow
                 }
             }
             .layoutPriority(0.1)
         }
+    }
+    
+    // MARK: - Subviews
+    private var playerInfoRow: some View {
+        HStack {
+            HStack(spacing: Drawing.spacing) {
+                playerImage(for: game.player)
+                playerName(game.player.name)
+                Text(" / ")
+                    .font(.basicSubtitle)
+                    .foregroundStyle(.basicBlack)
+                playerImage(for: game.opponent)
+                playerName(game.opponent.name)
+            }
+            Spacer()
+            scoreAndDate
+        }
+    }
+    
+    private var durationRow: some View {
+        Text("\(Resources.Text.duration.localized(language)): \(game.player.totalGameDuration) \(Resources.Text.sec.localized(language))")
+            .font(.basicSubtitleMini)
+            .padding(.horizontal, Drawing.horizontalPadding)
+            .foregroundStyle(.basicBlack)
+    }
+    
+    private var scoreAndDate: some View {
+        VStack {
+            Text("\(game.score)")
+                .font(.basicSubtitle)
+                .padding(.horizontal, Drawing.horizontalPadding)
+                .foregroundStyle(.basicBlack)
+            Text("\(formattedDate)")
+                .font(.caption)
+                .padding(.horizontal, Drawing.horizontalPadding)
+                .foregroundStyle(.basicBlue)
+        }
+    }
+    
+    // MARK: - Helpers
+    private func playerImage(for player: Player) -> some View {
+        Image(player.symbol == .x ? player.style.imageNames.player1 : player.style.imageNames.player2)
+            .resizable()
+            .frame(width: Drawing.imageSize, height: Drawing.imageSize)
+            .scaledToFit()
+            .padding(.leading, Drawing.horizontalPadding)
+    }
+    
+    private func playerName(_ name: String) -> some View {
+        Text(name)
+            .font(.basicSubtitle)
+            .foregroundStyle(.basicBlack)
+            .multilineTextAlignment(.center)
     }
 }

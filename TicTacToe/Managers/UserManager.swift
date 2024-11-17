@@ -63,4 +63,8 @@ final class UserManager {
     func updateOpponentScore() {
         opponent.totalWins += 1
     }
+    
+    func updateTotalDuration(duration: Int) {
+        player.totalGameDuration += duration
+    }
 }

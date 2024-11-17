@@ -55,6 +55,7 @@ final class GameManager {
     func updatePlayers() {
         self.player = userManager.getPlayer()
         self.opponent = userManager.getOpponent()
+        print(player.totalGameDuration)
     }
     
     // MARK: - Toggle Active Player

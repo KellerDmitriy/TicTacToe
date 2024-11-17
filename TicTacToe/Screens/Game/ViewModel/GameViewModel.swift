@@ -109,7 +109,7 @@ final class GameViewModel: ObservableObject {
             winningPattern = gameManager.getWinningPattern()
             updateScore()
             playFinalMusic()
-            gameManager.player.totalGameDuration += secondsCount
+            updateTotalDuration()
             saveGameResults()
          
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -150,6 +150,10 @@ final class GameViewModel: ObservableObject {
             ? userManager.updatePlayerScore()
             : userManager.updateOpponentScore()
         }
+    }
+    
+    func updateTotalDuration() {
+        userManager.updateTotalDuration(duration: secondsCount)
     }
     
     private func saveGameResults() {

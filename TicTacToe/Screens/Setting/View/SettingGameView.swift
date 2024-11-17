@@ -82,6 +82,12 @@ struct SettingGameView: View {
                 )
                 
                 SettingPickerView(
+                    selectedValue: $language,
+                    isExpanded: $isLanguageState,
+                    title: Resources.Text.selectedLanguage.localized(language)
+                )
+                
+                SettingPickerView(
                     selectedValue: $viewModel.selectedBoardSize,
                     isExpanded: $isSizeBoardState,
                     title: Resources.Text.selectSizeBoard.localized(language)
@@ -94,11 +100,6 @@ struct SettingGameView: View {
                     timerSeconds: $viewModel.duration
                 )
                 
-                SettingPickerView(
-                    selectedValue: $language,
-                    isExpanded: $isLanguageState,
-                    title: Resources.Text.selectedLanguage.localized(language)
-                )
                 
                 VStack(spacing: Drawing.spacingBetweenElements) {
                     HStack {

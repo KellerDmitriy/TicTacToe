@@ -6,11 +6,20 @@
 //
 
 import Foundation
+
+// MARK: - Coordinator
+
 final class Coordinator: ObservableObject {
+    // MARK: - Published Properties
     @Published var navigationState: NavigationState = .launchScreen
+    
+    // MARK: - Private Properties
     private var previousState: NavigationState = .mainScreen
+    
+    // MARK: - Dependencies
     var userManager: UserManager = UserManager()
     
+    // MARK: - NavigationState Enum
     enum NavigationState: Equatable {
         case launchScreen
         case mainScreen
@@ -22,6 +31,7 @@ final class Coordinator: ObservableObject {
         case leaderboard
     }
     
+    // MARK: - CoordinatorAction Enum
     enum CoordinatorAction {
         case showLaunchScreen
         case showMainScreen
@@ -34,10 +44,8 @@ final class Coordinator: ObservableObject {
         case backFromSettings
     }
     
-
-    
+    // MARK: - Navigation Reducer
     private func reduce(_ state: NavigationState, action: CoordinatorAction) -> NavigationState {
-        
         var newState = state
         
         switch action {
@@ -65,6 +73,7 @@ final class Coordinator: ObservableObject {
         return newState
     }
     
+    // MARK: - Navigation Updates
     func updateNavigationState(action: CoordinatorAction) {
         Task {
             await MainActor.run {
@@ -73,6 +82,7 @@ final class Coordinator: ObservableObject {
         }
     }
     
+    // MARK: - User Manager Reset
     func resetUserManager() {
         userManager = UserManager()
     }
