@@ -18,7 +18,7 @@ final class GameSelectViewModel: ObservableObject {
     private let coordinator: Coordinator
     
     // MARK: Initialization
-    init(userManager: UserManager = .shared, coordinator: Coordinator) {
+    init(userManager: UserManager, coordinator: Coordinator) {
         self.userManager = userManager
         self.coordinator = coordinator
     }
@@ -44,7 +44,7 @@ final class GameSelectViewModel: ObservableObject {
     }
     
     func showOnboarding() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
     
     // MARK: - Private Methods

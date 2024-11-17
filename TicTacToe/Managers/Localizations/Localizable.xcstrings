@@ -27,12 +27,22 @@
     "%@" : {
 
     },
-    "%@: %lld" : {
+    "%@: %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@: %2$lld"
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@: %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld %3$@"
           }
         }
       }
@@ -293,6 +303,17 @@
         }
       }
     },
+    "extraLarge" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ещё больше"
+          }
+        }
+      }
+    },
     "hard" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -349,6 +370,17 @@
         }
       }
     },
+    "large" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "большое"
+          }
+        }
+      }
+    },
     "Leaderboard" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -390,6 +422,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "светлая"
+          }
+        }
+      }
+    },
+    "medium" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "среднее"
           }
         }
       }
@@ -485,23 +528,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "не так быстро"
-          }
-        }
-      }
-    },
-    "OK" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ОК"
           }
         }
       }
@@ -653,6 +679,17 @@
         }
       }
     },
+    "sec" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "сек"
+          }
+        }
+      }
+    },
     "Second Player" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -738,6 +775,28 @@
         }
       }
     },
+    "Size Board:" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер поля:"
+          }
+        }
+      }
+    },
+    "small" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "маленькое"
+          }
+        }
+      }
+    },
     "system" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -745,6 +804,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "системная"
+          }
+        }
+      }
+    },
+    "The entire leaderboard will be cleared" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вся таблица лидеров очистится\n"
           }
         }
       }
@@ -794,19 +864,13 @@
         }
       }
     },
-    "Time" : {
-      "extractionState" : "stale",
+    "time" : {
+      "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Time"
-          }
-        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Время"
+            "value" : "время"
           }
         }
       }
@@ -852,6 +916,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Предупреждение"
+          }
+        }
+      }
+    },
+    "Winner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Победитель"
           }
         }
       }

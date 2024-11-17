@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		ADA899CA2CADAF8300363BDB /* GameSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA899C92CADAF7900363BDB /* GameSelectView.swift */; };
-		CB0B050E2CBAE06F001166B9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0B050D2CBAE06F001166B9 /* Theme.swift */; };
 		CB33F1372CB174070008A39F /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB33F1362CB174070008A39F /* TimerManager.swift */; };
 		CB33F13E2CB19C400008A39F /* LaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB33F13C2CB19C400008A39F /* LaunchScreen.swift */; };
 		CB511C4B2CAFD1E5001454B5 /* classic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CB511C442CAFD1E5001454B5 /* classic.mp3 */; };
@@ -54,6 +53,7 @@
 		E1B09F522CB44C0600F76BA3 /* ShadowedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B09F512CB44C0600F76BA3 /* ShadowedCardView.swift */; };
 		E1B09F542CB44C1B00F76BA3 /* LightBlueBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B09F532CB44C1B00F76BA3 /* LightBlueBackgroundView.swift */; };
 		E1B09F562CB44C4B00F76BA3 /* TitleTextModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B09F552CB44C4B00F76BA3 /* TitleTextModifier.swift */; };
+		E1CEA4622CDA6ED500B92117 /* LaunchScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CEA4612CDA6EC400B92117 /* LaunchScreenViewModel.swift */; };
 		E1E0BDB42CA9EC4900DB8D34 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0BDB32CA9EC4900DB8D34 /* GameManager.swift */; };
 		E1E0BDB92CA9F03400DB8D34 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0BDB82CA9F03400DB8D34 /* Player.swift */; };
 		E1E0BDBC2CA9F6B300DB8D34 /* Resources.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0BDBB2CA9F6B300DB8D34 /* Resources.swift */; };
@@ -69,14 +69,13 @@
 		E1E0BDD92CAA94FC00DB8D34 /* RulesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0BDD82CAA94FC00DB8D34 /* RulesViewModel.swift */; };
 		E1E0BDDB2CAA974700DB8D34 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E1E0BDDA2CAA974700DB8D34 /* Localizable.xcstrings */; };
 		E1E0BDDE2CAA997300DB8D34 /* CoordinatorVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0BDDD2CAA997300DB8D34 /* CoordinatorVIew.swift */; };
+		E1EC3C242CC0F326000778B7 /* StateMashine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EC3C232CC0F326000778B7 /* StateMashine.swift */; };
 		E1FCE9512CB6E15D0026CA1F /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FCE9502CB6E15D0026CA1F /* CustomTextField.swift */; };
 		E1FCE9532CB7AB060026CA1F /* GameModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FCE9522CB7AB060026CA1F /* GameModeButton.swift */; };
-		E1FCE9562CB7C3780026CA1F /* GameReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FCE9552CB7C3780026CA1F /* GameReducer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		ADA899C92CADAF7900363BDB /* GameSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSelectView.swift; sourceTree = "<group>"; };
-		CB0B050D2CBAE06F001166B9 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		CB33F1362CB174070008A39F /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
 		CB33F13C2CB19C400008A39F /* LaunchScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
 		CB33F13F2CB19C590008A39F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -124,6 +123,7 @@
 		E1B09F512CB44C0600F76BA3 /* ShadowedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowedCardView.swift; sourceTree = "<group>"; };
 		E1B09F532CB44C1B00F76BA3 /* LightBlueBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightBlueBackgroundView.swift; sourceTree = "<group>"; };
 		E1B09F552CB44C4B00F76BA3 /* TitleTextModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleTextModifier.swift; sourceTree = "<group>"; };
+		E1CEA4612CDA6EC400B92117 /* LaunchScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewModel.swift; sourceTree = "<group>"; };
 		E1E0BDB32CA9EC4900DB8D34 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		E1E0BDB82CA9F03400DB8D34 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		E1E0BDBB2CA9F6B300DB8D34 /* Resources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Resources.swift; sourceTree = "<group>"; };
@@ -139,9 +139,9 @@
 		E1E0BDD82CAA94FC00DB8D34 /* RulesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesViewModel.swift; sourceTree = "<group>"; };
 		E1E0BDDA2CAA974700DB8D34 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E1E0BDDD2CAA997300DB8D34 /* CoordinatorVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorVIew.swift; sourceTree = "<group>"; };
+		E1EC3C232CC0F326000778B7 /* StateMashine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateMashine.swift; sourceTree = "<group>"; };
 		E1FCE9502CB6E15D0026CA1F /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		E1FCE9522CB7AB060026CA1F /* GameModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModeButton.swift; sourceTree = "<group>"; };
-		E1FCE9552CB7C3780026CA1F /* GameReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameReducer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +158,7 @@
 		CB33F13D2CB19C400008A39F /* LaunchScreen */ = {
 			isa = PBXGroup;
 			children = (
+				E1CEA4612CDA6EC400B92117 /* LaunchScreenViewModel.swift */,
 				CB33F13C2CB19C400008A39F /* LaunchScreen.swift */,
 			);
 			path = LaunchScreen;
@@ -197,8 +198,8 @@
 			isa = PBXGroup;
 			children = (
 				CB33F13F2CB19C590008A39F /* Info.plist */,
+				E1E0BDCF2CAA8DBE00DB8D34 /* Coordinator */,
 				CB6F3E542CA997AA005C2ED9 /* TicTacToeApp.swift */,
-				CB33F13D2CB19C400008A39F /* LaunchScreen */,
 				E1E0BDB52CA9EFCC00DB8D34 /* Models */,
 				CB6F3E6C2CA9AF33005C2ED9 /* Screens */,
 				CB6F3E652CA9A527005C2ED9 /* DesignSystem */,
@@ -240,6 +241,7 @@
 		CB6F3E6C2CA9AF33005C2ED9 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				CB33F13D2CB19C400008A39F /* LaunchScreen */,
 				E1E0BDDF2CAA9B1800DB8D34 /* Game */,
 				CB6F3E6D2CA9AF3F005C2ED9 /* Start */,
 				E1E0BDC12CAA865800DB8D34 /* Setting */,
@@ -283,7 +285,6 @@
 			isa = PBXGroup;
 			children = (
 				E1392EF92CAD367F00112013 /* SettingModel.swift */,
-				CB0B050D2CBAE06F001166B9 /* Theme.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -319,7 +320,6 @@
 		E1392F082CADC2ED00112013 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E1FCE9552CB7C3780026CA1F /* GameReducer.swift */,
 				E148E8792CB2C4EA00018E70 /* SubViews */,
 				E1392F062CADA88400112013 /* GameView.swift */,
 			);
@@ -329,6 +329,7 @@
 		E1392F092CADC2F500112013 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				E1EC3C232CC0F326000778B7 /* StateMashine.swift */,
 				E1392F102CADE7DD00112013 /* GameViewModel.swift */,
 			);
 			path = ViewModel;
@@ -388,7 +389,6 @@
 				E1392EEC2CAD2E6C00112013 /* UserManager.swift */,
 				E1E0BDB32CA9EC4900DB8D34 /* GameManager.swift */,
 				CB33F1362CB174070008A39F /* TimerManager.swift */,
-				E1E0BDCF2CAA8DBE00DB8D34 /* Coordinator */,
 				E1E0BDDC2CAA976500DB8D34 /* Localizations */,
 			);
 			path = Managers;
@@ -513,7 +513,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					CB6F3E502CA997AA005C2ED9 = {
 						CreatedOnToolsVersion = 15.4;
@@ -606,14 +606,14 @@
 				E1E0BDDE2CAA997300DB8D34 /* CoordinatorVIew.swift in Sources */,
 				E1E0BDCC2CAA89A400DB8D34 /* LocalizationManager.swift in Sources */,
 				E1E0BDD32CAA94A500DB8D34 /* StartViewModel.swift in Sources */,
+				E1CEA4622CDA6ED500B92117 /* LaunchScreenViewModel.swift in Sources */,
+				E1EC3C242CC0F326000778B7 /* StateMashine.swift in Sources */,
 				E1392F1B2CADEAD200112013 /* MusicManager.swift in Sources */,
 				CB7C6CE22CB5102600EF1DA9 /* ShadowViewModifier.swift in Sources */,
-				E1FCE9562CB7C3780026CA1F /* GameReducer.swift in Sources */,
 				E1392F022CAD47D400112013 /* ToolBarView.swift in Sources */,
 				E1392F0E2CADD9E700112013 /* GameResult.swift in Sources */,
 				E148E8782CB282D300018E70 /* CustomAlertView.swift in Sources */,
 				E1392F1C2CADEAD200112013 /* MusicStorage.swift in Sources */,
-				CB0B050E2CBAE06F001166B9 /* Theme.swift in Sources */,
 				E1392F072CADA88500112013 /* GameView.swift in Sources */,
 				CB6F3E672CA9A539005C2ED9 /* BasicButton.swift in Sources */,
 				E1E0BDC52CAA86C200DB8D34 /* RulesView.swift in Sources */,
@@ -630,6 +630,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -693,6 +694,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

@@ -9,15 +9,15 @@ import SwiftUI
 
 struct SettingGameView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-
-    @ObservedObject var viewModel: SettingsViewModel
+    
+    @StateObject var viewModel: SettingsViewModel
     
     @State private var isLanguageState = false
     @State private var isMusicState = false
     @State private var isLevelState = false
     @State private var isSymbolState = false
     @State private var isThemeState = false
-    
+    @State private var isSizeBoardState = false
     
     // MARK: - Drawing Constants
     enum Drawing {
@@ -32,6 +32,9 @@ struct SettingGameView: View {
         static let titleFontSize: CGFloat = 20
     }
     
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: SettingsViewModel(coordinator: coordinator))
+    }
     var body: some View {
         ZStack {
             Color.basicBackground.ignoresSafeArea()
@@ -53,6 +56,7 @@ struct SettingGameView: View {
                 Spacer()
             }
         }
+//        .preferredColorScheme(viewModel.themeMode.colorScheme)
     }
     
     private var toolBar: some View {
@@ -72,9 +76,21 @@ struct SettingGameView: View {
             VStack(spacing: Drawing.spacingBetweenElements) {
                 
                 SettingPickerView(
-                    selectedValue: $viewModel.userTheme,
+                    selectedValue: $viewModel.themeMode,
                     isExpanded: $isThemeState,
                     title: Resources.Text.selectTheme.localized(language)
+                )
+                
+                SettingPickerView(
+                    selectedValue: $language,
+                    isExpanded: $isLanguageState,
+                    title: Resources.Text.selectedLanguage.localized(language)
+                )
+                
+                SettingPickerView(
+                    selectedValue: $viewModel.selectedBoardSize,
+                    isExpanded: $isSizeBoardState,
+                    title: Resources.Text.selectSizeBoard.localized(language)
                 )
                 
                 TimerView(
@@ -84,11 +100,6 @@ struct SettingGameView: View {
                     timerSeconds: $viewModel.duration
                 )
                 
-                SettingPickerView(
-                    selectedValue: $language,
-                    isExpanded: $isLanguageState,
-                    title: Resources.Text.selectedLanguage.localized(language)
-                )
                 
                 VStack(spacing: Drawing.spacingBetweenElements) {
                     HStack {
@@ -147,7 +158,7 @@ struct SettingGameView: View {
                                 styleImageForPlayer1: style.imageNames.player1,
                                 styleImageForPlayer2: style.imageNames.player2,
                                 isSelected: isSelected,
-                                isPlayer1Selected: viewModel.selectedPlayerSymbol == .tic,
+                                isPlayer1Selected: viewModel.selectedPlayerSymbol == .x,
                                 action: {
                                     withAnimation {
                                         viewModel.selectedIndex = style
@@ -164,13 +175,14 @@ struct SettingGameView: View {
                 .onAppear {
                     proxy.scrollTo(viewModel.selectedIndex, anchor: .center)
                 }
+
+                }
             }
         }
     }
-    
-}
+
 
 #Preview {
-    SettingGameView(viewModel: SettingsViewModel(coordinator: Coordinator()))
+    SettingGameView(coordinator: Coordinator())
 }
 

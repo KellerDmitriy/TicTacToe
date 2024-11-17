@@ -9,7 +9,11 @@ import SwiftUI
 
 struct RulesView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
-    @ObservedObject var viewModel: RulesViewModel
+    @StateObject var viewModel: RulesViewModel
+    
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: RulesViewModel(coordinator: coordinator))
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -61,5 +65,5 @@ struct RulesView: View {
 }
 
 #Preview {
-    RulesView(viewModel: RulesViewModel(coordinator: Coordinator()))
+    RulesView(coordinator: Coordinator())
 }

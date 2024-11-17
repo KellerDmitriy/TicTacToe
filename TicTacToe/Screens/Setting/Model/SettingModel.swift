@@ -5,20 +5,59 @@
 //  Created by Келлер Дмитрий on 02.10.2024.
 //
 
-import Foundation
+import SwiftUI
 
 struct GameSettings: Codable {
+    var themeMode: ThemeMode
     let level: DifficultyLevel
     let duration: Duration
     let selectedStyle: PlayerStyle?
     let isSelecttedMusic: Bool
     let musicStyle: MusicStyle
     let playerSymbol: PlayerSymbol?
+    var boardSize: BoardSize
+}
+
+enum ThemeMode: String, CaseIterable, Codable {
+    case system = "system"
+    case light = "light"
+    case dark = "dark"
+    
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
+}
+
+enum BoardSize: String, Codable, CaseIterable {
+    case small
+    case medium
+    case large
+    case extraLarge 
+    
+    var dimension: Int {
+        switch self {
+        case .small:
+            return 3
+        case .medium:
+            return 4
+        case .large:
+            return 5
+        case .extraLarge:
+            return 6
+        }
+    }
 }
 
 enum PlayerSymbol: String, Codable {
-    case tic
-    case tacToe
+    case x
+    case o
 }
 
 struct Duration: Codable {
@@ -68,12 +107,14 @@ enum PlayerStyle: Codable, CaseIterable {
 extension GameSettings {
     static func defaultGameSettings() -> GameSettings {
         return GameSettings(
+            themeMode: .system,
             level: .normal,
             duration: defaultRaundDuration(),
             selectedStyle: .crossPinkCirclePurple,
             isSelecttedMusic: false,
             musicStyle: .none,
-            playerSymbol: .tic
+            playerSymbol: .x,
+            boardSize: .small
         )
     }
     

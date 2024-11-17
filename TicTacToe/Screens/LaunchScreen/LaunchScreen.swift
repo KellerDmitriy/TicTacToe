@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct LaunchScreen: View {
+    
+    @StateObject var viewModel: LaunchScreenViewModel
+    
     @State private var isAnimating = false
     @State private var textIndex = 0
     @State private var isTextVisible = false
-    let textArray = Array(Resources.Text.ticTacToe)  
- 
+    let textArray = Array(Resources.Text.ticTacToe)
+    
+    
+    init(coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: LaunchScreenViewModel(coordinator: coordinator))
+    }
     
     var body: some View {
         ZStack {
@@ -63,6 +70,7 @@ struct LaunchScreen: View {
                             textIndex += 1
                         } else {
                             timer.invalidate()
+                            viewModel.startGame()
                         }
                     }
                 }
@@ -72,6 +80,7 @@ struct LaunchScreen: View {
     }
 }
 
+
 #Preview {
-    LaunchScreen()
+    LaunchScreen(coordinator: Coordinator())
 }

@@ -9,6 +9,8 @@ import Foundation
 
 enum Resources {
     enum Text {
+        static let winner = "Winner"
+        static let sec = "sec"
         static let ai = "AI"
         static let back = "Back"
         static let bestGames = "Best Games"
@@ -20,6 +22,8 @@ enum Resources {
         static let enterYourNameAlert = "Please enter name"
         static let leaderboard = "Leaderboard"
         static let leaderboardEmptyMessage = "No game history"
+        
+        static let leaderboardWarning = "The entire leaderboard will be cleared"
         static let letsPlay = "Let's play"
         static let loseResult = "You lose!"
         static let next = "Next"
@@ -34,6 +38,7 @@ enum Resources {
         static let rulesNavigationTitle = "How to play"
         static let selectDifficultyLevel = "Difficulty:"
         static let selectTheme = "Theme:"
+        static let selectSizeBoard = "Size Board:"
         static let selectGame = "Select Game"
         static let selectMusicStyle = "Music:"
         static let selectPlayerSkins = "Player Skins:"
@@ -42,7 +47,7 @@ enum Resources {
         static let settings = "Settings"
         static let singlePlayer = "Single Player"
         static let ticTacToe = "TIC-TAC-TOE"
-        static let time = "Time"
+        static let time = "time"
         static let score = "Score"
         static let twoPlayers = "Two Players"
         static let winResult = " Win!"

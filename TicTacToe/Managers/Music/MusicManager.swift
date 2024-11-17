@@ -8,17 +8,17 @@
 import AVKit
 
 final class MusicManager {
-    static let shared = MusicManager()
+  
     private let storageManager = StorageManager.shared
     private var musicPlayer = AVAudioPlayer()
     private var soundPlayer = AVAudioPlayer()
     private var settings: GameSettings?
     
-    private init() {}
+    init() {}
     
     func playMusic() {
         settings = storageManager.getSettings()
-        guard let settings, !musicPlayer.isPlaying else { return }
+        guard let settings, settings.isSelecttedMusic, !musicPlayer.isPlaying else { return }
         if let urlMusic = MusicStorage.getMusicFor(settings.musicStyle) {
             do {
                 musicPlayer = try AVAudioPlayer(contentsOf: urlMusic)
@@ -35,6 +35,7 @@ final class MusicManager {
     }
     
     func playSoundFor(_ state: SoundState) {
+        guard let settings, settings.isSelecttedMusic, !musicPlayer.isPlaying else { return }
         if let urlSound = MusicStorage.getSoundFor(state) {
             do {
                 soundPlayer = try AVAudioPlayer(contentsOf: urlSound)

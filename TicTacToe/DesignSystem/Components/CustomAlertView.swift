@@ -11,6 +11,8 @@ struct CustomAlertView: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     let message: String
     let onDismiss: () -> Void
+    var showSecondButton: Bool = false
+    var secondButtonAction: (() -> Void)?
     
     var body: some View {
         ShadowedCardView(cornerRadius: 30) {
@@ -22,15 +24,24 @@ struct CustomAlertView: View {
                 Text(message)
                     .font(.title3)
                     .multilineTextAlignment(.center)
+                    .lineLimit(5)
                 
                 BasicButton(
                     styleType: .primary,
                     title: "ok",
                     tapHandler: onDismiss
                 )
+                
+                if showSecondButton {
+                    BasicButton(
+                        styleType: .primary,
+                        title: "Cancel",
+                        tapHandler: { secondButtonAction?() }
+                    )
+                }
             }
         }
-        .frame(width: 300, height: 200)
+     
     }
 }
 

@@ -8,17 +8,16 @@
 import Foundation
 
 final class TimerManager {
-    static let shared = TimerManager()
     
     var outOfTime: (() -> Void)?
     var onTimeChange: ((Int) -> Void)?
     private var timer = Timer()
-    private var duration: Duration = Duration(isSelectedDuration: false, valueDuration: nil) // Начальное значение
+    private var duration: Duration = Duration(isSelectedDuration: false, valueDuration: nil) 
     var secondsCount: Int = 0
     
-    private init() {}
     
     func startTimer() {
+        stopTimer()
         let settings = StorageManager.shared.getSettings()
         duration = settings.duration
         
@@ -30,6 +29,7 @@ final class TimerManager {
         
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateCount), userInfo: nil, repeats: true)
     }
+    
     
     func stopTimer() {
         timer.invalidate()

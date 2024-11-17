@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - GameSelectView
 struct GameSelectView: View {
     // MARK: - Properties
-    @ObservedObject var viewModel: GameSelectViewModel
+    @StateObject var viewModel: GameSelectViewModel
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     @State private var showCustomAlert = false
     
@@ -23,6 +23,11 @@ struct GameSelectView: View {
         static let twoPlayersHeight: CGFloat = 514
         static let padding10: CGFloat = 10
         static let paddingBottom: CGFloat = 20
+    }
+    
+    // MARK: - Init
+    init(userManager: UserManager, coordinator: Coordinator) {
+        self._viewModel = StateObject(wrappedValue: GameSelectViewModel(userManager: userManager, coordinator: coordinator))
     }
     
     // MARK: - Body
@@ -56,6 +61,7 @@ struct GameSelectView: View {
                         showCustomAlert = false
                     }
                 }
+                .frame(width: 300, height: 200)
                 .background(Color.basicBlack.opacity(0.4).edgesIgnoringSafeArea(.all))
                 .cornerRadius(Drawing.cornerRadius)
                 .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
@@ -97,7 +103,7 @@ struct GameSelectView: View {
                             placeHolder: Resources.Text.enterYourName.localized(language),
                             text: $viewModel.player
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                     }
                     
                     GameModeButton(
@@ -115,13 +121,13 @@ struct GameSelectView: View {
                             placeHolder: Resources.Text.enterYourName.localized(language),
                             text: $viewModel.player
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                         
                         CustomTextField(
                             placeHolder: Resources.Text.opponentName.localized(language),
                             text: $viewModel.opponent
                         )
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(.opacity)
                     }
                     
                     nextButton
@@ -157,6 +163,6 @@ struct GameSelectView: View {
 
 // MARK: - Preview
 #Preview {
-    GameSelectView(viewModel: GameSelectViewModel(coordinator: Coordinator()))
+    GameSelectView(userManager: UserManager(), coordinator: Coordinator())
 }
 

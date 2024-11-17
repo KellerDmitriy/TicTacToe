@@ -16,8 +16,6 @@ final class LeaderboardViewModel: ObservableObject {
     private let coordinator: Coordinator
     private let storageManager: StorageManager
     
-    
-    
     // MARK: Initialization
     init(coordinator: Coordinator, storageManager: StorageManager = .shared) {
         self.coordinator = coordinator
@@ -32,15 +30,20 @@ final class LeaderboardViewModel: ObservableObject {
         bestRound = rounds.first
     }
     
-    
     private func getBestGames() {
         bestGames = storageManager.getLeaderboardGames()
-        bestGames.sort {$0.player.score > $1.player.score}
+        bestGames.sort { $0.player.totalWins > $1.player.totalWins }
+    }
+    
+    func deleteAll() {
+        bestRound = nil
+        bestGames.removeAll()
+        storageManager.deleteLeaderboardGames()
     }
     
     //MARK: - NavigationState
     func dismissLeaderboard() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
 }
 

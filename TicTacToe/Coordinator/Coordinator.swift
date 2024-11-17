@@ -6,10 +6,23 @@
 //
 
 import Foundation
+
+// MARK: - Coordinator
+
 final class Coordinator: ObservableObject {
+    // MARK: - Published Properties
+    @Published var navigationState: NavigationState = .launchScreen
     
+    // MARK: - Private Properties
+    private var previousState: NavigationState = .mainScreen
+    
+    // MARK: - Dependencies
+    var userManager: UserManager = UserManager()
+    
+    // MARK: - NavigationState Enum
     enum NavigationState: Equatable {
-        case onboarding
+        case launchScreen
+        case mainScreen
         case selectGame
         case game
         case setting
@@ -18,8 +31,10 @@ final class Coordinator: ObservableObject {
         case leaderboard
     }
     
+    // MARK: - CoordinatorAction Enum
     enum CoordinatorAction {
-        case showOnboarding
+        case showLaunchScreen
+        case showMainScreen
         case selectGame
         case startGame
         case showSettings
@@ -29,47 +44,46 @@ final class Coordinator: ObservableObject {
         case backFromSettings
     }
     
-    @Published var navigationState: NavigationState = .onboarding
-    private var previousState: NavigationState = .onboarding
-    
+    // MARK: - Navigation Reducer
     private func reduce(_ state: NavigationState, action: CoordinatorAction) -> NavigationState {
-        
         var newState = state
         
         switch action {
-        case .showOnboarding:
-            previousState = state 
-            newState = .onboarding
+        case .showLaunchScreen:
+            newState = .launchScreen
+        case .showMainScreen:
+            resetUserManager()
+            newState = .mainScreen
         case .selectGame:
-            previousState = state
             newState = .selectGame
         case .startGame:
-            previousState = state
             newState = .game
         case .showSettings:
             previousState = state
             newState = .setting
         case .showRules:
-            previousState = state
             newState = .rules
         case .showResult(let winner, let playedAgainstAI):
-            previousState = state
             newState = .result(winner: winner, playedAgainstAI: playedAgainstAI)
         case .leaderboard:
-            previousState = state
             newState = .leaderboard
         case .backFromSettings:
             newState = previousState
         }
-        
         return newState
     }
     
+    // MARK: - Navigation Updates
     func updateNavigationState(action: CoordinatorAction) {
         Task {
             await MainActor.run {
                 navigationState = reduce(navigationState, action: action)
             }
         }
+    }
+    
+    // MARK: - User Manager Reset
+    func resetUserManager() {
+        userManager = UserManager()
     }
 }

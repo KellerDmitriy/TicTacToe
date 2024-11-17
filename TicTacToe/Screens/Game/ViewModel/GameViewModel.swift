@@ -4,246 +4,183 @@
 //
 //  Created by Келлер Дмитрий on 30.09.2024.
 //
-
 import Foundation
 
+@MainActor
 final class GameViewModel: ObservableObject {
-    // MARK: - Properties
-    @Published var gameBoard: [PlayerSymbol?] = Array(repeating: nil, count: 9)
-    @Published private(set) var gameResult: GameResult? = nil
     
-    @Published var winningPattern: [Int]? = nil
-    
-    @Published var player: Player
-    @Published var opponent: Player
-    @Published var currentPlayer: Player
+    // MARK: - Published Properties
+    @Published private(set) var gameBoard: [PlayerSymbol?] = []
     @Published var secondsCount = 0
-    @Published var roundResults: [String] = []
+    @Published var timerDisplay = "00:00"
+    @Published private(set) var currentState: StateMachine.GameState = .startGame
     
-    var totalGameDuration: Int = 0
-    
+    // MARK: - Private Properties
+    private let stateMachine: StateMachine
     private let coordinator: Coordinator
+    private var gameManager: GameManager
     private let userManager: UserManager
-    private let gameManager: GameManager
-    private let storageManager: StorageManager
-    private let musicManager: MusicManager
     private let timerManager: TimerManager
-    private var boardBlocked = false
+    private let musicManager: MusicManager
     
-    var gameMode: GameMode { userManager.gameMode }
-    var level: DifficultyLevel { storageManager.getSettings().level }
-    var playerStyle: PlayerStyle { player.style }
+    private let storageManager = StorageManager.shared
+    
+    var boardSize: BoardSize
+    var gameMode: GameMode
+    var level: DifficultyLevel
+    
+    // MARK: - Computed Properties
+    var activePlayer: Player { gameManager.activePlayer }
+    var player: Player { gameManager.player }
+    var opponent: Player { gameManager.opponent }
+    var currentScore: String { "\(player.totalWins) : \(opponent.totalWins)" }
+    var winningPattern: [Int]? = nil
     
     // MARK: - Initialization
-    init(
-        coordinator: Coordinator,
-        userManager: UserManager = .shared,
-        gameManager: GameManager = .shared,
-        storageManager: StorageManager = .shared,
-        musicManager: MusicManager = .shared,
-        timerManager: TimerManager = .shared
-    ) {
+    init(userManager: UserManager, coordinator: Coordinator) {
         self.coordinator = coordinator
         self.userManager = userManager
-        self.gameManager = gameManager
-        self.storageManager = storageManager
-        self.musicManager = musicManager
-        self.timerManager = timerManager
+        self.timerManager = TimerManager()
+        self.musicManager = MusicManager()
         
-        // Инициализация игроков
-        self.player = userManager.getPlayer()
-        self.opponent = userManager.getOpponent()
-        self.currentPlayer = userManager.getOpponent()
+        // Load game settings
+        self.boardSize = storageManager.getSettings().boardSize
+        self.gameMode = userManager.gameMode
+        self.level = storageManager.getSettings().level
         
-        gameManager.aiMoveHandler = processMoveResult
-        timerManager.outOfTime = handleOutOfTime
-        timerManager.onTimeChange = { [weak self] in self?.secondsCount = $0 }
-        resetGame()
-        musicManager.playMusic()
+        // Initialize game manager and state machine
+        self.gameManager = GameManager(boardSize, level, userManager)
+        self.stateMachine = StateMachine(initialState: .startGame)
+        
+        setupGameBindings()
+        handleStateChange(.startGame)
     }
     
-    // Метод для случайного выбора первого хода
-    private func getFirstMove() {
-        currentPlayer = Bool.random() ? player : opponent
-        if gameMode == .singlePlayer && currentPlayer == opponent  {
-            gameManager.makeFirstMoveForSinglePlayerMode(player1: player, player2: opponent, level: level)
-        }
-    }
-    
-    // MARK: - Game Logic
-    func processPlayerMove(for position: Int) {
-        guard !boardBlocked else { return }
-        gameManager.setCurrentPlayer(currentPlayer)
-        let opponentPlayer = currentPlayer == player ? opponent : player
-        var moved = false
-        switch gameMode {
-        case .singlePlayer:
-            moved = gameManager.makeMoveForSinglePlayerMode(
-                at: position,
-                player1: currentPlayer,
-                player2: opponentPlayer,
-                level: level
-            )
-        case .twoPlayer:
-            moved = gameManager.makeMove(at: position, for: currentPlayer, opponent: opponentPlayer)
+    private func setupGameBindings() {
+        stateMachine.onStateChange = { [weak self] newState in
+            self?.handleStateChange(newState)
         }
         
-        if moved {
-            if gameManager.isGameOver {
-                let result = gameManager.getGameResult(
-                    gameMode: gameMode,
-                    player: currentPlayer,
-                    opponent: opponentPlayer
-                )
-                
-                boardBlocked = true
-                totalGameDuration += secondsCount
-                recordRoundResult()
-                
-                // Обработка окончания игры
-                handleEndOfGame(result: result)
-            } else {
-                togglePlayer()
+        stateMachine.onToggleActivePlayer = { [weak self] in
+            self?.gameManager.togglePlayerActive()
+        }
+        
+        gameManager.onBoardChange = { [weak self] updatedBoard in
+            guard let self else { return }
+            self.gameBoard = updatedBoard
+            self.triggerEvent(.toggleActivePlayer)
+            self.triggerEvent(.moveAI)
+        }
+        
+        gameManager.onGameOver = { [weak self] in
+            self?.triggerEvent(.gameOver)
+        }
+        
+        timerManager.onTimeChange = { [weak self] newTime in
+            DispatchQueue.main.async {
+                self?.secondsCount = newTime
+                self?.timerDisplay = self?.formattedTime(newTime) ?? "00:00"
             }
         }
-        if gameMode == .twoPlayer {
-            processMoveResult()
+        
+        timerManager.outOfTime = { [weak self] in
+            self?.triggerEvent(.outOfTime)
         }
     }
     
-    private func handleEndOfGame(result: GameResult) {
-        if gameMode == .singlePlayer && gameManager.winner?.name == Resources.Text.ai {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-                self?.musicManager.stopMusic()
-                self?.timerManager.stopTimer()
-                self?.musicManager.playSoundFor(.final)
-                self?.winningPattern = self?.gameManager.getWinningPattern()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-                    self?.handleGameResult(result)
-                }
+    private func handleStateChange(_ state: StateMachine.GameState) {
+        currentState = state
+        
+        switch state {
+        case .startGame:
+            gameManager.resetGame()
+            musicManager.playMusic()
+            timerManager.startTimer()
+            stateMachine.handle(event: .refresh)
+            
+        case .play:
+            if gameManager.activePlayer.isAI {
+                gameManager.aiMove()
             }
-        } else {
+         
+        case .gameOver:
             musicManager.stopMusic()
             timerManager.stopTimer()
-            musicManager.playSoundFor(.final)
             winningPattern = gameManager.getWinningPattern()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-                self?.handleGameResult(result)
+            updateScore()
+            playFinalMusic()
+            updateTotalDuration()
+            saveGameResults()
+         
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.navigateToResultScreen()
             }
         }
     }
     
-    private func recordRoundResult() {
-        let resultString = "\(player.name): \(player.score) - \(opponent.name): \(opponent.score) (Duration: \(totalGameDuration) seconds)"
-        roundResults.append(resultString)
+    func triggerEvent(_ event: StateMachine.GameEvent) {
+        stateMachine.handle(event: event)
     }
     
-    func processMoveResult() {
-        if gameMode == .twoPlayer {
-            gameBoard = gameManager.gameBoard
-        } else {
-            boardBlocked = true
-            let playerSymbol = opponent.name == Resources.Text.ai ? player.symbol : opponent.symbol
-            for (index, symbol) in gameManager.gameBoard.enumerated() {
-                if symbol == playerSymbol {
-                    gameBoard[index] = symbol
-                }
-            }
-            if !gameManager.isGameOver {
-                togglePlayer()
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-                guard
-                    let player = self?.player,
-                    let gameManager = self?.gameManager
-                else { return }
-                self?.gameBoard = gameManager.gameBoard
-                self?.currentPlayer = player
-                self?.boardBlocked = false
+    func processPlayerMove(at position: Int) {
+        if stateMachine.currentState == .play {
+            if !activePlayer.isAI {
+                gameManager.makeMove(at: position)
             }
         }
     }
     
-    func resetGame() {
-        gameManager.resetGame(firstPlayer: player, secondPlayer: opponent)
-        timerManager.startTimer()
-        secondsCount = timerManager.secondsCount
-        getFirstMove()
-        gameBoard = Array(repeating: nil, count: 9)
-        winningPattern = nil
+    private func playFinalMusic() {
+        musicManager.playSoundFor(.final)
+        musicManager.stopMusic()
     }
     
-    private func handleGameResult(_ result: GameResult) {
-        gameResult = result
-        if let leaderboardWinner = gameManager.winner {
-            if leaderboardWinner == player {
-                player.score += 1
-                userManager.updatePlayerScore(player.score)
-            } else if leaderboardWinner == opponent {
-                opponent.score += 1
-                userManager.updateOpponentScore(opponent.score)
-            }
-            
-            // Сохраняем данные о лучших раундах и играх
-            storageManager.saveLeaderboardRound(player: player, opponent: opponent, durationRound: secondsCount)
-            storageManager.saveLeaderboardGame(player: player, opponent: opponent, score: getGameScore(), totalDuration: getGameDuration())
-        }
-        //        let gameDuration = "\(secondsCount / 60):\(secondsCount % 60)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
-            self?.goToResults(result)
+    // MARK: - Navigation
+    private func navigateToResultScreen() {
+        coordinator.updateNavigationState(action: .showResult(
+            winner: gameManager.winner,
+            playedAgainstAI: gameMode == .singlePlayer
+        ))
+    }
+    
+    // MARK: - Score Management
+    private func updateScore() {
+        if let winner = gameManager.winner {
+            winner == player
+            ? userManager.updatePlayerScore()
+            : userManager.updateOpponentScore()
         }
     }
     
-    // Метод для переключения между игроками
-    private func togglePlayer() {
-        gameManager.switchPlayer(with: player, opponent: opponent)
-        currentPlayer = gameManager.currentPlayer ?? player
+    func updateTotalDuration() {
+        userManager.updateTotalDuration(duration: secondsCount)
     }
     
-    private func goToResults(_ result: GameResult) {
-        switch result {
-        case .win:
-            coordinator.updateNavigationState(
-                action: .showResult(
-                    winner: gameManager.winner,
-                    playedAgainstAI: gameMode == .singlePlayer
-                )
-            )
-        case .lose:
-            coordinator.updateNavigationState(
-                action: .showResult(
-                    winner: opponent,
-                    playedAgainstAI: gameMode == .singlePlayer
-                )
-            )
-        case .draw:
-            coordinator.updateNavigationState(
-                action: .showResult(
-                    winner: nil,
-                    playedAgainstAI: gameMode == .singlePlayer
-                )
+    private func saveGameResults() {
+        gameManager.updatePlayers()
+        if let winner = gameManager.winner {
+            storageManager.saveLeaderboardRound(
+                winner: winner,
+                durationRound: secondsCount
             )
         }
-    }
-    
-    private func handleOutOfTime() {
-        timerManager.stopTimer()
-        coordinator.updateNavigationState(
-            action: .showResult(
-                winner: nil,
-                playedAgainstAI: gameMode == .singlePlayer
-            )
+        storageManager.saveLeaderboardGame(
+            player: player,
+            opponent: opponent,
+            score: getGameScore()
         )
     }
     
     //    MARK: - Methods for LiederBoard
     private func getGameScore() -> String {
-        let gameScore = ("\(player.score) : \(opponent.score)")
+        let gameScore = ("\(player.totalWins) : \(opponent.totalWins)")
         return gameScore
     }
     
-    private func getGameDuration() -> String {
-        let gameDuration = "\(totalGameDuration) seconds"
-        return gameDuration
+    // MARK: - Helpers
+    private func formattedTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let seconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

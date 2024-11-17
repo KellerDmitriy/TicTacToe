@@ -11,19 +11,15 @@ import SwiftUI
 
 final class SettingsViewModel: ObservableObject {
     // MARK: Properties
+    @AppStorage("themeMode") var themeMode: ThemeMode = .system
     @Published var selectedIndex: PlayerStyle
     @Published var selectedDuration: Duration
     @Published var selectedMusic: MusicStyle
     @Published var selectedLevel: DifficultyLevel
     @Published var selectedPlayerSymbol: PlayerSymbol
+    @Published var selectedBoardSize: BoardSize
     @Published var hasAppliedTheme: Bool = false
     @Published var isSelectedMusic: Bool
-    //UserTheme
-    @AppStorage("user_theme") var userTheme: Theme = .systemDefaut {
-        didSet {
-            applyTheme()
-        }
-    }
     
     private let coordinator: Coordinator
     private let storageManager: StorageManager
@@ -43,36 +39,14 @@ final class SettingsViewModel: ObservableObject {
         self.coordinator = coordinator
         self.gameSettings = storageManager.getSettings()
         
+        self.themeMode = gameSettings.themeMode
         self.selectedIndex = gameSettings.selectedStyle ?? .crossFilledPurpleCircleFilledPurple
         self.selectedDuration = gameSettings.duration
         self.isSelectedMusic = gameSettings.isSelecttedMusic
         self.selectedMusic = gameSettings.musicStyle
         self.selectedLevel = gameSettings.level
-        self.selectedPlayerSymbol = gameSettings.playerSymbol ?? .tic
-        // Theme apply
-        applyTheme()
-    }
-    // Apply the selected theme to the app
-    
-    func applyTheme() {
-        if let window = UIApplication.shared.connectedScenes
-            .compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first {
-            switch userTheme {
-            case .light:
-                window.overrideUserInterfaceStyle = .light
-            case .dark:
-                window.overrideUserInterfaceStyle = .dark
-            default:
-                window.overrideUserInterfaceStyle = .unspecified
-            }
-            
-        }
-        
-        if !isFirstLoad {
-            hasAppliedTheme = true
-        } else {
-            isFirstLoad = false
-        }
+        self.selectedPlayerSymbol = gameSettings.playerSymbol ?? .x
+        self.selectedBoardSize = gameSettings.boardSize
     }
     
     func saveSettings() {
@@ -81,12 +55,14 @@ final class SettingsViewModel: ObservableObject {
         : Duration(isSelectedDuration: false, valueDuration: nil)
         
         gameSettings = GameSettings(
+            themeMode: themeMode,
             level: selectedLevel,
             duration: duration,
             selectedStyle: selectedIndex,
             isSelecttedMusic: isSelectedMusic,
             musicStyle: selectedMusic,
-            playerSymbol: selectedPlayerSymbol
+            playerSymbol: selectedPlayerSymbol,
+            boardSize: selectedBoardSize
         )
         storageManager.saveSettings(gameSettings)
     }
@@ -97,7 +73,7 @@ final class SettingsViewModel: ObservableObject {
         selectedDuration = defaultSettings.duration
         selectedMusic = defaultSettings.musicStyle
         selectedLevel = defaultSettings.level
-        selectedPlayerSymbol = defaultSettings.playerSymbol ?? .tic
+        selectedPlayerSymbol = defaultSettings.playerSymbol ?? .x
         saveSettings()
     }
     

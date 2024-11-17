@@ -30,7 +30,7 @@ final class ResultViewModel: ObservableObject {
     
     //MARK: - NavigationState
     func openLaunch() {
-        coordinator.updateNavigationState(action: .showOnboarding)
+        coordinator.updateNavigationState(action: .showMainScreen)
     }
     
     func restartGame() {

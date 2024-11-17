@@ -11,7 +11,7 @@ struct RoundRow: View {
     @AppStorage("selectedLanguage") private var language = LocalizationService.shared.language
     let round: LeaderboardRound
     
-    struct DrawingConstants {
+    enum DrawingConstants {
         static let padding: CGFloat = 12
         static let textPadding: CGFloat = 4
     }
@@ -26,12 +26,14 @@ struct RoundRow: View {
                 HStack(spacing: DrawingConstants.padding) {
                     SecondaryPurpleBackgroundView {
                         HStack {
-                            Text(round.player.name)
+                            Text("\(Resources.Text.winner.localized(language)): \(round.winner.name)")
                                 .font(.buttonTitle)
+                                .lineLimit(3)
+                               
                                 .foregroundStyle(.basicBlack)
                                 .padding(.leading, DrawingConstants.textPadding)
                             Spacer()
-                            Text("\(Resources.Text.time.localized(language)): \(round.durationRound)")
+                            Text("\(Resources.Text.time.localized(language)): \(round.durationRound) \(Resources.Text.sec.localized(language))")
                                 .font(.number)
                                 .foregroundStyle(.basicBlack)
                                 .padding(.trailing, DrawingConstants.textPadding)
@@ -45,3 +47,5 @@ struct RoundRow: View {
         }
     }
 }
+
+
