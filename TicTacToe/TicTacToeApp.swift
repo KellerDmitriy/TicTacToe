@@ -7,7 +7,7 @@ struct TicTacToeApp: App {
     var body: some Scene {
         WindowGroup {
             CoordinatorView()
-                .padding(.all)
+           
         }
     }
 }
