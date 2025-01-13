@@ -18,7 +18,7 @@ struct Player: Equatable, Codable {
     var totalWins: Int = 0
     var totalGameDuration: Int = 0
     var totalLosses: Int = 0
-    var totalRounds: Int = 0
+
     
     // MARK: - Initializer
     init(name: String, score: Int, symbol: PlayerSymbol, style: PlayerStyle, isActive: Bool = false, isAI: Bool = false) {
