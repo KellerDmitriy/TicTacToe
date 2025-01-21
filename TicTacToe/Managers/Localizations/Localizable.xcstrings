@@ -185,6 +185,9 @@
         }
       }
     },
+    "DetailScreen" : {
+
+    },
     "Difficulty:" : {
       "extractionState" : "manual",
       "localizations" : {

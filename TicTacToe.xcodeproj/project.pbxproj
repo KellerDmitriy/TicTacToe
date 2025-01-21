@@ -45,6 +45,7 @@
 		E1392F172CADE80300112013 /* GameSquareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1392F142CADE80300112013 /* GameSquareView.swift */; };
 		E1392F1B2CADEAD200112013 /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1392F182CADEAD200112013 /* MusicManager.swift */; };
 		E1392F1C2CADEAD200112013 /* MusicStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1392F192CADEAD200112013 /* MusicStorage.swift */; };
+		E139A9A32D3FBC2A0047DE6D /* DetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E139A9A22D3FBC2A0047DE6D /* DetailScreen.swift */; };
 		E139A9A12D3FBA9F0047DE6D /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = E139A9A02D3FBA9F0047DE6D /* Network.swift */; };
 		E148E8682CAF420800018E70 /* GameMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E148E8672CAF420800018E70 /* GameMode.swift */; };
 		E148E8782CB282D300018E70 /* CustomAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E148E8772CB282D300018E70 /* CustomAlertView.swift */; };
@@ -116,6 +117,7 @@
 		E1392F142CADE80300112013 /* GameSquareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSquareView.swift; sourceTree = "<group>"; };
 		E1392F182CADEAD200112013 /* MusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
 		E1392F192CADEAD200112013 /* MusicStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicStorage.swift; sourceTree = "<group>"; };
+		E139A9A22D3FBC2A0047DE6D /* DetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailScreen.swift; sourceTree = "<group>"; };
 		E139A9A02D3FBA9F0047DE6D /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		E148E8672CAF420800018E70 /* GameMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameMode.swift; sourceTree = "<group>"; };
 		E148E8772CB282D300018E70 /* CustomAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertView.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				E1E0BDB52CA9EFCC00DB8D34 /* Models */,
 				CB6F3E6C2CA9AF33005C2ED9 /* Screens */,
 				CB6F3E652CA9A527005C2ED9 /* DesignSystem */,
+				E1392F1A2CADEAD200112013 /* Music */,
 				E1E0BDB22CA9EC3300DB8D34 /* Managers */,
 				E1E0BDBA2CA9F67000DB8D34 /* Resources */,
 				CB6F3E5A2CA997AB005C2ED9 /* Preview Content */,
@@ -252,6 +255,7 @@
 				E1E0BDC62CAA86C700DB8D34 /* Result */,
 				E1E0BDC72CAA86D400DB8D34 /* Rules */,
 				CB86AF372CAC957900C025FA /* Leaderboard */,
+				E139A9A42D3FBC2E0047DE6D /* Detail */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -347,6 +351,14 @@
 			path = Music;
 			sourceTree = "<group>";
 		};
+		E139A9A42D3FBC2E0047DE6D /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				E139A9A22D3FBC2A0047DE6D /* DetailScreen.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
 		E148E8792CB2C4EA00018E70 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -387,7 +399,6 @@
 		E1E0BDB22CA9EC3300DB8D34 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				E1392F1A2CADEAD200112013 /* Music */,
 				E1392EEE2CAD2E6C00112013 /* StorageManager.swift */,
 				E1392EEC2CAD2E6C00112013 /* UserManager.swift */,
 				E1E0BDB32CA9EC4900DB8D34 /* GameManager.swift */,
@@ -622,6 +633,7 @@
 				E1392F1C2CADEAD200112013 /* MusicStorage.swift in Sources */,
 				E1392F072CADA88500112013 /* GameView.swift in Sources */,
 				CB6F3E672CA9A539005C2ED9 /* BasicButton.swift in Sources */,
+				E139A9A32D3FBC2A0047DE6D /* DetailScreen.swift in Sources */,
 				E1E0BDC52CAA86C200DB8D34 /* RulesView.swift in Sources */,
 				CBA971042CB8399C00B39E30 /* SecondaryPurpleBackgroundView.swift in Sources */,
 				ADA899CA2CADAF8300363BDB /* GameSelectView.swift in Sources */,
